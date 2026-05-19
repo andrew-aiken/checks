@@ -1,6 +1,6 @@
-module github.com/andrew-aiken/nats-score/checks
+module github.com/andrew-aiken/checks
 
-go 1.25
+go 1.26
 
 require (
 	github.com/miekg/dns v1.1.69

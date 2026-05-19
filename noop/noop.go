@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/andrew-aiken/nats-score/checks"
+	"github.com/andrew-aiken/checks"
 )
 
 type Definition struct {

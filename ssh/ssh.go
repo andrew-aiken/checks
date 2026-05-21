@@ -14,15 +14,15 @@ import (
 )
 
 type Definition struct {
-	Command      string `json:"command" optiontype:"required"`  // Command to run if successfully connected with SSH
+	Command      string `json:"command"`                        // Command to run if successfully connected with SSH
 	ContentRegex string `json:"contentRegex" default:".*"`      // regex for the response to match
 	Host         string `json:"host" optiontype:"required"`     // IP or hostname of the host to run the SSH check against
 	KeyFile      string `json:"keyFile"`                        // Path to local SSH key
-	Port         uint16  `json:"port" default:"22"`              // SSH port
+	Port         uint16 `json:"port" default:"22"`              // SSH port
 	Username     string `json:"username" optiontype:"required"` // User to SSH with
 	Password     string `json:"password"`                       // User password
 	MatchContent bool   `json:"matchContent"`                   // Whether the response must match a defined regex for the check to pass
-	Timeout      uint8   `json:"timeout" default:"20"`           // Timeout for the SSH client connection in seconds
+	Timeout      uint8  `json:"timeout" default:"20"`           // Timeout for the SSH client connection in seconds
 }
 
 func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
@@ -70,6 +70,11 @@ func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.R
 		return result
 	}
 	defer sshSession.Close()
+
+	if definition.Command == "" {
+		result.Passed = true
+		return result
+	}
 
 	output, err := sshSession.CombinedOutput(definition.Command)
 	if err != nil {
@@ -124,10 +129,6 @@ func (d *Definition) generateAuth() ([]ssh.AuthMethod, error) {
 
 // Validats the SSH definition is valid
 func (d *Definition) Validate() (passed bool, message string) {
-	if d.Command == "" {
-		return false, "Command needs to be defined"
-	}
-
 	if d.Host == "" {
 		return false, "Host needs to be defined"
 	}

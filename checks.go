@@ -9,6 +9,7 @@ import (
 // Checker is the interface that all check types must implement
 type Checker interface {
 	Run(ctx context.Context, static StaticConf) Results
+	Validate() (passed bool, message string)
 }
 
 type Results struct {

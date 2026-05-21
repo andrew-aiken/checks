@@ -9,7 +9,7 @@ import (
 
 type StaticConf struct {
 	// Add fields for static configuration here
-	TeamNumber    int16  // TeamNumber
+	TeamNumber    uint16  // TeamNumber
 	TeamNumberHex string // TeamNumberHex
 }
 

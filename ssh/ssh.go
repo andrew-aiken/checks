@@ -25,7 +25,7 @@ type Definition struct {
 	Timeout      uint8  `json:"timeout" default:"20"`           // Timeout for the SSH client connection in seconds
 }
 
-func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
+func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
 	result := checks.Results{Timestamp: time.Now()}
 
 	definitionBytes, err := checks.TemplateDefinition(d, static)
@@ -102,7 +102,7 @@ func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.R
 	return result
 }
 
-func (d *Definition) generateAuth() ([]ssh.AuthMethod, error) {
+func (d Definition) generateAuth() (sshAuth []ssh.AuthMethod, err error) {
 	var authMethods []ssh.AuthMethod
 
 	if d.Password != "" {
@@ -128,7 +128,7 @@ func (d *Definition) generateAuth() ([]ssh.AuthMethod, error) {
 }
 
 // Validats the SSH definition is valid
-func (d *Definition) Validate() (passed bool, message string) {
+func (d Definition) Validate() (passed bool, message string) {
 	if d.Host == "" {
 		return false, "Host needs to be defined"
 	}

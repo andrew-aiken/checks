@@ -31,7 +31,7 @@ type Definition struct {
 	Timeout      uint8             `json:"timeout" default:"20"`       // Timeout for the http query in seconds
 }
 
-func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
+func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
 	// Initialize empty result
 	result := checks.Results{Timestamp: time.Now()}
 
@@ -64,7 +64,7 @@ func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.R
 	}
 
 	// TODO: create child context with deadline less than the parent context
-	pass, _, err := request(ctx, client, *d)
+	pass, _, err := d.request(ctx, client)
 
 	// Process request results
 	result.Passed = pass
@@ -75,7 +75,7 @@ func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.R
 	return result
 }
 
-func request(ctx context.Context, client *http.Client, d Definition) (bool, *string, error) {
+func (d Definition) request(ctx context.Context, client *http.Client) (success bool, foo *string, err error) {
 	// Construct URL
 	var schema string
 	if d.HTTPS {
@@ -144,7 +144,7 @@ func request(ctx context.Context, client *http.Client, d Definition) (bool, *str
 }
 
 // Validats the http definition is valid
-func (d *Definition) Validate() (passed bool, message string) {
+func (d Definition) Validate() (passed bool, message string) {
 	if d.Host == "" {
 		return false, "Host needs to be defined"
 	}

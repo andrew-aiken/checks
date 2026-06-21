@@ -11,7 +11,7 @@ import (
 )
 
 // NewDefinition takes in a check type and returns its definition
-func NewDefinition(checkType string) (any, error) {
+func NewDefinition(checkType string) (definitionType any, err error) {
 	switch checkType {
 	case "dns":
 		return &dns.Definition{}, nil

@@ -23,7 +23,7 @@ type Definition struct {
 }
 
 // Run a single instance of the check
-func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
+func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
 	// Initialize empty result
 	result := checks.Results{Timestamp: time.Now()}
 
@@ -75,7 +75,7 @@ func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.R
 }
 
 // Validats the dns definition is valid
-func (d *Definition) Validate() (passed bool, message string) {
+func (d Definition) Validate() (passed bool, message string) {
 	if d.Server == "" {
 		return false, "Server needs to be defined"
 	}

@@ -20,7 +20,7 @@ type Definition struct {
 	Timeout         uint8  `json:"timeout" default:"10"`           // Timeout for the icmp query in seconds
 }
 
-func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
+func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
 	// Initialize empty result
 	result := checks.Results{Timestamp: time.Now()}
 
@@ -82,7 +82,7 @@ func (d *Definition) Run(ctx context.Context, static checks.StaticConf) checks.R
 }
 
 // Validats the icmp definition is valid
-func (d *Definition) Validate() (passed bool, message string) {
+func (d Definition) Validate() (passed bool, message string) {
 	if d.Host == "" {
 		return false, "Host needs to be defined"
 	}

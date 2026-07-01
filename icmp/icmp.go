@@ -91,7 +91,7 @@ func (d Definition) Validate() (passed bool, message string) {
 		return false, "Count must be larger then 0"
 	}
 
-	if d.Percent <= 0 || d.Percent > 100 {
+	if d.Percent < 0 || d.Percent > 100 {
 		return false, "Percent must be between 0 and 100"
 	}
 

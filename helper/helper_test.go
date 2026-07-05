@@ -1,8 +1,10 @@
-package helper
+package helper_test
 
 import (
 	"fmt"
 	"testing"
+
+	"github.com/andrew-aiken/checks/helper"
 
 	"github.com/andrew-aiken/checks/dns"
 	"github.com/andrew-aiken/checks/http"
@@ -11,12 +13,14 @@ import (
 	"github.com/andrew-aiken/checks/ssh"
 )
 
+type Test struct {
+	checkType string
+	want      any
+	wantErr   bool
+}
+
 func TestNewDefinition(t *testing.T) {
-	tests := []struct {
-		checkType string
-		want      any
-		wantErr   bool
-	}{
+	tests := []Test{
 		{"dns", &dns.Definition{}, false},
 		{"http", &http.Definition{}, false},
 		{"icmp", &icmp.Definition{}, false},
@@ -28,7 +32,7 @@ func TestNewDefinition(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.checkType, func(t *testing.T) {
-			got, err := NewDefinition(test.checkType)
+			got, err := helper.NewDefinition(test.checkType)
 			if (err != nil) != test.wantErr {
 				t.Fatalf("NewDefinition(%q) error = %v, wantErr %v", test.checkType, err, test.wantErr)
 			}

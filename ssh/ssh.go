@@ -14,15 +14,26 @@ import (
 )
 
 type Definition struct {
-	Command      string `json:"command"`                        // Command to run if successfully connected with SSH
-	ContentRegex string `json:"contentRegex" default:".*"`      // regex for the response to match
-	Host         string `json:"host" optiontype:"required"`     // IP or hostname of the host to run the SSH check against
-	KeyFile      string `json:"keyFile"`                        // Path to local SSH key
-	Port         uint16 `json:"port" default:"22"`              // SSH port
-	Username     string `json:"username" optiontype:"required"` // User to SSH with
-	Password     string `json:"password"`                       // User password
-	MatchContent bool   `json:"matchContent"`                   // Whether the response must match a defined regex for the check to pass
-	Timeout      uint8  `json:"timeout" default:"20"`           // Timeout for the SSH client connection in seconds
+	// Command to run if successfully connected with SSH
+	Command string `json:"command"`
+	// regex for the response to match
+	ContentRegex string `json:"contentRegex" default:".*"`
+	// IP or hostname of the host to run the SSH check against
+	Host string `json:"host" optiontype:"required"`
+	// SSH private key
+	Key string `json:"key"`
+	// Path to local SSH key
+	KeyFile string `json:"keyFile"`
+	// SSH port
+	Port uint16 `json:"port" default:"22"`
+	// User to SSH with
+	Username string `json:"username" optiontype:"required"`
+	// User password
+	Password string `json:"password"`
+	// Whether the response must match a defined regex for the check to pass
+	MatchContent bool `json:"matchContent"`
+	// Timeout for the SSH client connection in seconds
+	Timeout uint8 `json:"timeout" default:"20"`
 }
 
 func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
@@ -109,10 +120,17 @@ func (d Definition) generateAuth() (sshAuth []ssh.AuthMethod, err error) {
 		authMethods = append(authMethods, ssh.Password(d.Password))
 	}
 
-	if d.KeyFile != "" {
-		key, err := os.ReadFile(d.KeyFile)
-		if err != nil {
-			return authMethods, fmt.Errorf("unable to read private key: %v", err)
+	if d.Key != "" || d.KeyFile != "" {
+		var key []byte
+
+		// Read ssh key file
+		if d.KeyFile != "" {
+			key, err = os.ReadFile(d.KeyFile)
+			if err != nil {
+				return authMethods, fmt.Errorf("unable to read private key: %v", err)
+			}
+		} else {
+			key = []byte(d.Key)
 		}
 
 		// Create the Signer for this private key.
@@ -137,8 +155,12 @@ func (d Definition) Validate() (passed bool, message string) {
 		return false, "Username needs to be defined"
 	}
 
-	if d.KeyFile == "" && d.Password == "" {
-		fmt.Println("Warning | Both ssh keyfile and password are not defined")
+	if d.Key != "" && d.KeyFile != "" {
+		return false, "Cannot have both Key and KeyFile defined"
+	}
+
+	if d.Key == "" && d.KeyFile == "" && d.Password == "" {
+		return false, "No authentication method defined"
 	}
 
 	return true, ""

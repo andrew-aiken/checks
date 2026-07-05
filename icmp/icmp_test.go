@@ -1,4 +1,4 @@
-package icmp
+package icmp_test
 
 import (
 	"context"
@@ -6,18 +6,19 @@ import (
 	"testing"
 
 	"github.com/andrew-aiken/checks"
+	"github.com/andrew-aiken/checks/icmp"
 )
 
 type ValidateTest struct {
 	Name            string
-	Definition      Definition
+	Definition      icmp.Definition
 	ValidatePassed  bool
 	ValidateMessage string
 }
 
 type RunTest struct {
 	Name                    string
-	Definition              Definition
+	Definition              icmp.Definition
 	Result                  checks.Results
 	MessageSubstring        string
 	ExpectedDetailKeys      []string
@@ -33,7 +34,7 @@ func TestICMPValidate(t *testing.T) {
 	tests := []ValidateTest{
 		{
 			Name: "InvalidDefinitionMissingHost",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: true,
 				Count:           1,
 				Percent:         100,
@@ -44,7 +45,7 @@ func TestICMPValidate(t *testing.T) {
 		},
 		{
 			Name: "NegativeCount",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: true,
 				Count:           -1,
 				Host:            "invalid-hostname-for-checks.invalid",
@@ -56,7 +57,7 @@ func TestICMPValidate(t *testing.T) {
 		},
 		{
 			Name: "InvalidPercentage",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: true,
 				Count:           1,
 				Host:            "invalid-hostname-for-checks.invalid",
@@ -68,7 +69,7 @@ func TestICMPValidate(t *testing.T) {
 		},
 		{
 			Name: "ValidDefinition",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: true,
 				Count:           1,
 				Host:            "invalid-hostname-for-checks.invalid",
@@ -98,7 +99,7 @@ func TestICMPRun(t *testing.T) {
 	tests := []RunTest{
 		{
 			Name: "FailureTemplateParse",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: true,
 				Count:           1,
 				Host:            "{{",
@@ -112,7 +113,7 @@ func TestICMPRun(t *testing.T) {
 		},
 		{
 			Name: "FailureInvalidHost",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: true,
 				Count:           1,
 				Host:            "invalid-hostname-for-checks.invalid",
@@ -126,7 +127,7 @@ func TestICMPRun(t *testing.T) {
 		},
 		{
 			Name: "FailurePacketCountMismatch",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: true,
 				Count:           1,
 				Host:            "192.0.2.1",
@@ -144,7 +145,7 @@ func TestICMPRun(t *testing.T) {
 		},
 		{
 			Name: "FailurePacketLossThreshold",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: false,
 				Count:           1,
 				Host:            "192.0.2.1",
@@ -159,7 +160,7 @@ func TestICMPRun(t *testing.T) {
 		},
 		{
 			Name: "CloudflareHostCheckPacketLoss",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: false,
 				Count:           1,
 				Host:            "1.1.1.1",
@@ -172,25 +173,12 @@ func TestICMPRun(t *testing.T) {
 		},
 		{
 			Name: "CloudflareHostCheck",
-			Definition: Definition{
+			Definition: icmp.Definition{
 				AllowPacketLoss: true,
-				Count:   1,
-				Host:    "1.1.1.1",
-				Percent: 100,
-				Timeout: 2,
-			},
-			Result: checks.Results{
-				Passed: true,
-			},
-		},
-		{
-			Name: "CloudflareHostCheck",
-			Definition: Definition{
-				AllowPacketLoss: true,
-				Count:   1,
-				Host:    "1.1.1.1",
-				Percent: 100,
-				Timeout: 2,
+				Count:           1,
+				Host:            "1.1.1.1",
+				Percent:         100,
+				Timeout:         2,
 			},
 			Result: checks.Results{
 				Passed: true,

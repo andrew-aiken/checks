@@ -7,18 +7,20 @@ import (
 	"github.com/andrew-aiken/checks"
 )
 
+type Test struct {
+	name                string
+	input               any
+	expected            string
+	expectedErrorString string
+}
+
 func TestTemplateDefinition(t *testing.T) {
 	config := checks.StaticConf{
 		TeamNumber:    1,
 		TeamNumberHex: "1",
 	}
 
-	tests := []struct {
-		name                string
-		input               any
-		expected            string
-		expectedErrorString string
-	}{
+	tests := []Test{
 		{
 			name:     "non-template",
 			input:    `{"foo": "bar"}`,
@@ -42,8 +44,7 @@ func TestTemplateDefinition(t *testing.T) {
 
 			if err != nil {
 				if !strings.HasPrefix(err.Error(), tt.expectedErrorString) {
-					t.Error(err)
-					t.FailNow()
+					t.Fatal(err)
 				}
 			}
 			output := string(bytes)

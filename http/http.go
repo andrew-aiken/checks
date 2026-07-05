@@ -15,20 +15,34 @@ import (
 )
 
 type Definition struct {
-	Host         string            `json:"host" optiontype:"required"` // IP or FQDN of the HTTP server
-	Path         string            `json:"path" default:"/"`           // Path to request - see RFC3986, section 3.3
-	HTTPS        bool              `json:"https" default:"false"`      // if HTTPS is to be used
-	Port         uint16            `json:"port" default:"80"`          // TCP port number the HTTP server is listening on
-	Method       string            `json:"method" default:"GET"`       // HTTP method to use
-	Code         uint16            `json:"code" default:"200"`         // the response status code to match
-	ContentRegex string            `json:"contentRegex" default:".*"`  // regex for the response body to match
-	Headers      map[string]string `json:"headers"`                    // name-value pairs of header fields to add/override
-	Body         string            `json:"body"`                       // the request body
-	MatchCode    bool              `json:"matchCode"`                  // whether the response code must match a defined value for the check to pass
-	MatchContent bool              `json:"matchContent"`               // whether the response body must match a defined regex for the check to pass
-	Redirect     bool              `json:"redirect"`                   // whether to follow http redirects
-	VerifyCert   bool              `json:"verifyCert"`                 // whether to verify the server's TLS certificate
-	Timeout      uint8             `json:"timeout" default:"20"`       // Timeout for the http query in seconds
+	// IP or FQDN of the HTTP server
+	Host string `json:"host" optiontype:"required"`
+	// Path to request - see RFC3986, section 3.3
+	Path string `json:"path" default:"/"`
+	// if HTTPS is to be used
+	HTTPS bool `json:"https" default:"false"`
+	// TCP port number the HTTP server is listening on
+	Port uint16 `json:"port" default:"80"`
+	// HTTP method to use
+	Method string `json:"method" default:"GET"`
+	// the response status code to match
+	Code uint16 `json:"code" default:"200"`
+	// regex for the response body to match
+	ContentRegex string `json:"contentRegex" default:".*"`
+	// name-value pairs of header fields to add/override
+	Headers map[string]string `json:"headers"`
+	// the request body
+	Body string `json:"body"`
+	// whether the response code must match a defined value for the check to pass
+	MatchCode bool `json:"matchCode"`
+	// whether the response body must match a defined regex for the check to pass
+	MatchContent bool `json:"matchContent"`
+	// whether to follow http redirects
+	Redirect bool `json:"redirect"`
+	// whether to verify the server's TLS certificate
+	VerifyCert bool `json:"verifyCert"`
+	// Timeout for the http query in seconds
+	Timeout uint8 `json:"timeout" default:"20"`
 }
 
 func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
@@ -64,7 +78,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 	}
 
 	// TODO: create child context with deadline less than the parent context
-	pass, _, err := d.request(ctx, client)
+	pass, err := d.request(ctx, client)
 
 	// Process request results
 	result.Passed = pass
@@ -75,7 +89,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 	return result
 }
 
-func (d Definition) request(ctx context.Context, client *http.Client) (success bool, foo *string, err error) {
+func (d Definition) request(ctx context.Context, client *http.Client) (success bool, err error) {
 	// Construct URL
 	var schema string
 	if d.HTTPS {
@@ -92,7 +106,7 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 	// Construct request
 	req, err := http.NewRequestWithContext(ctx, d.Method, url, strings.NewReader(d.Body))
 	if err != nil {
-		return false, nil, fmt.Errorf("Error constructing request: %s", err)
+		return false, fmt.Errorf("Error constructing request: %s", err)
 	}
 
 	// Handle Host header specially if present
@@ -109,44 +123,51 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 	// Send request
 	resp, err := client.Do(req)
 	if err != nil {
-		return false, nil, fmt.Errorf("Error making request: %s", err)
+		return false, fmt.Errorf("Error making request: %s", err)
 	}
 	defer resp.Body.Close()
 
 	// Check status code
 	if d.MatchCode && uint16(resp.StatusCode) != d.Code {
-		return false, nil, fmt.Errorf("Received bad status code: %d", resp.StatusCode)
+		return false, fmt.Errorf("Received bad status code: %d", resp.StatusCode)
 	}
 
 	// Check body content
-	var matchStr string
 	if d.MatchContent {
 		// Read response body
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return false, nil, fmt.Errorf("Received error when reading response body: %s", err)
+			return false, fmt.Errorf("Received error when reading response body: %s", err)
 		}
 
 		// Check if body matches regex
 		regex, err := regexp.Compile(d.ContentRegex)
 		if err != nil {
-			return false, nil, fmt.Errorf("Error compiling regex string %s : %s", d.ContentRegex, err)
+			return false, fmt.Errorf("Error compiling regex string %s : %s", d.ContentRegex, err)
 		}
 		if !regex.Match(body) {
-			return false, nil, fmt.Errorf("Received bad response body")
+			return false, fmt.Errorf("Received bad response body")
 		}
-		matches := regex.FindSubmatch(body)
-		matchStr = string(matches[len(matches)-1])
 	}
 
 	// If we've reached this point, then the check succeeded
-	return true, &matchStr, nil
+	return true, nil
 }
 
 // Validats the http definition is valid
 func (d Definition) Validate() (passed bool, message string) {
 	if d.Host == "" {
 		return false, "Host needs to be defined"
+	}
+
+	if d.Redirect && d.Port != 0 {
+		return false, "Port unused due to redirect specified"
+	}
+
+	if d.MatchContent && d.ContentRegex != "" {
+		if _, err := regexp.Compile(d.ContentRegex); err != nil {
+			return false, "Failed to compile regex"
+		}
 	}
 
 	return true, ""

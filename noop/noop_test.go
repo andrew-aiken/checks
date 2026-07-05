@@ -1,15 +1,16 @@
-package noop
+package noop_test
 
 import (
 	"context"
 	"testing"
 
 	"github.com/andrew-aiken/checks"
+	"github.com/andrew-aiken/checks/noop"
 )
 
 type Test struct {
 	Name       string
-	Definition Definition
+	Definition noop.Definition
 	Result     checks.Results
 }
 
@@ -22,7 +23,7 @@ func TestNoop(t *testing.T) {
 	tests := []Test{
 		{
 			Name: "Success",
-			Definition: Definition{
+			Definition: noop.Definition{
 				Pass: true,
 			},
 			Result: checks.Results{
@@ -33,7 +34,7 @@ func TestNoop(t *testing.T) {
 		},
 		{
 			Name: "Failure",
-			Definition: Definition{
+			Definition: noop.Definition{
 				Pass: false,
 			},
 			Result: checks.Results{

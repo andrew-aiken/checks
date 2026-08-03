@@ -1,9 +1,8 @@
-// NOTE: ICMP is currently skipped in GitHub actions tests due to it being blocked
-
 package icmp_test
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 
@@ -94,6 +93,10 @@ func TestICMPValidate(t *testing.T) {
 }
 
 func TestICMPRun(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping because the icmp protocol is blocked by GitHub actions")
+	}
+
 	tests := []RunTest{
 		{
 			Name: "FailureTemplateParse",

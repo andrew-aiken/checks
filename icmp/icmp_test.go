@@ -1,3 +1,5 @@
+// NOTE: ICMP is currently skipped in GitHub actions tests due to it being blocked
+
 package icmp_test
 
 import (

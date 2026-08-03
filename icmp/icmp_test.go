@@ -38,7 +38,6 @@ func TestICMPValidate(t *testing.T) {
 				AllowPacketLoss: true,
 				Count:           1,
 				Percent:         100,
-				Timeout:         1,
 			},
 			ValidatePassed:  false,
 			ValidateMessage: "Host needs to be defined",
@@ -50,7 +49,6 @@ func TestICMPValidate(t *testing.T) {
 				Count:           -1,
 				Host:            "invalid-hostname-for-checks.invalid",
 				Percent:         100,
-				Timeout:         1,
 			},
 			ValidatePassed:  false,
 			ValidateMessage: "Count must be larger then 0",
@@ -62,7 +60,6 @@ func TestICMPValidate(t *testing.T) {
 				Count:           1,
 				Host:            "invalid-hostname-for-checks.invalid",
 				Percent:         127,
-				Timeout:         1,
 			},
 			ValidatePassed:  false,
 			ValidateMessage: "Percent must be between 0 and 100",
@@ -74,7 +71,6 @@ func TestICMPValidate(t *testing.T) {
 				Count:           1,
 				Host:            "invalid-hostname-for-checks.invalid",
 				Percent:         100,
-				Timeout:         1,
 			},
 			ValidatePassed:  true,
 			ValidateMessage: "",
@@ -104,7 +100,6 @@ func TestICMPRun(t *testing.T) {
 				Count:           1,
 				Host:            "{{",
 				Percent:         100,
-				Timeout:         1,
 			},
 			Result: checks.Results{
 				Passed: false,
@@ -118,7 +113,6 @@ func TestICMPRun(t *testing.T) {
 				Count:           1,
 				Host:            "invalid-hostname-for-checks.invalid",
 				Percent:         100,
-				Timeout:         1,
 			},
 			Result: checks.Results{
 				Passed: false,
@@ -132,7 +126,6 @@ func TestICMPRun(t *testing.T) {
 				Count:           1,
 				Host:            "192.0.2.1",
 				Percent:         100,
-				Timeout:         1,
 			},
 			Result: checks.Results{
 				Passed: false,
@@ -150,7 +143,6 @@ func TestICMPRun(t *testing.T) {
 				Count:           1,
 				Host:            "192.0.2.1",
 				Percent:         100,
-				Timeout:         1,
 			},
 			Result: checks.Results{
 				Passed: false,
@@ -165,7 +157,6 @@ func TestICMPRun(t *testing.T) {
 				Count:           1,
 				Host:            "1.1.1.1",
 				Percent:         100,
-				Timeout:         2,
 			},
 			Result: checks.Results{
 				Passed: true,
@@ -178,7 +169,6 @@ func TestICMPRun(t *testing.T) {
 				Count:           1,
 				Host:            "1.1.1.1",
 				Percent:         100,
-				Timeout:         2,
 			},
 			Result: checks.Results{
 				Passed: true,
@@ -190,6 +180,11 @@ func TestICMPRun(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
+			// Default values are assigned when parsing from json only
+			if tt.Definition.Timeout == 0 {
+				tt.Definition.Timeout = 1
+			}
+
 			pass, message := tt.Definition.Validate()
 			if !pass {
 				t.Fatalf("Failed to validate check(%q) message %s", tt.Name, message)

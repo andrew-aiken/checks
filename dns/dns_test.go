@@ -37,7 +37,6 @@ func TestDNSValidate(t *testing.T) {
 				ExpectedResult: "DNE",
 				Port:           53,
 				RecordType:     "A",
-				Timeout:        10,
 			},
 			ValidateMessage: "Server needs to be defined",
 		},
@@ -49,7 +48,6 @@ func TestDNSValidate(t *testing.T) {
 				ExpectedResult: "DNE",
 				Port:           53,
 				RecordType:     "A",
-				Timeout:        10,
 			},
 			ValidateMessage: "FQDN needs to be defined",
 		},
@@ -61,7 +59,6 @@ func TestDNSValidate(t *testing.T) {
 				// ExpectedResult: "",
 				Port:       53,
 				RecordType: "A",
-				Timeout:    10,
 			},
 			ValidateMessage: "Expected result needs to be defined",
 		},
@@ -100,7 +97,6 @@ func TestDNSRun(t *testing.T) {
 				ExpectedResult: "dummy",
 				RecordType:     "A",
 				Port:           53,
-				Timeout:        20,
 			},
 			Result: checks.Results{
 				Passed: false,
@@ -115,7 +111,6 @@ func TestDNSRun(t *testing.T) {
 				ExpectedResult: "dne",
 				RecordType:     "A",
 				Port:           53,
-				Timeout:        20,
 			},
 			Result: checks.Results{
 				Passed: false,
@@ -130,7 +125,6 @@ func TestDNSRun(t *testing.T) {
 				ExpectedResult: "dne",
 				RecordType:     "A",
 				Port:           53,
-				Timeout:        20,
 			},
 			Result: checks.Results{
 				Passed: false,
@@ -145,7 +139,6 @@ func TestDNSRun(t *testing.T) {
 				ExpectedResult: "1.1.1.1",
 				RecordType:     "A",
 				Port:           53,
-				Timeout:        20,
 			},
 			Result: checks.Results{
 				Passed: true,
@@ -157,6 +150,11 @@ func TestDNSRun(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
+			// Default values are assigned when parsing from json only
+			if tt.Definition.Timeout == 0 {
+				tt.Definition.Timeout = 10
+			}
+
 			pass, message := tt.Definition.Validate()
 			if !pass {
 				t.Fatalf("Failed to validate check(%q) message %s", tt.Name, message)

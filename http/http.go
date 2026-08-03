@@ -41,8 +41,8 @@ type Definition struct {
 	Redirect bool `json:"redirect"`
 	// whether to verify the server's TLS certificate
 	VerifyCert bool `json:"verifyCert"`
-	// Timeout for the http query in seconds
-	Timeout uint8 `json:"timeout" default:"20"`
+	// Shared configuration across all checks
+	checks.SharedDefinition
 }
 
 func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {

@@ -32,8 +32,8 @@ type Definition struct {
 	Password string `json:"password"`
 	// Whether the response must match a defined regex for the check to pass
 	MatchContent bool `json:"matchContent"`
-	// Timeout for the SSH client connection in seconds
-	Timeout uint8 `json:"timeout" default:"20"`
+	// Shared configuration across all checks
+	checks.SharedDefinition
 }
 
 func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {

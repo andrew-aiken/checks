@@ -11,8 +11,7 @@ import (
 	"github.com/miekg/dns"
 )
 
-// The Definition configures the behavior of the DNS check
-// it implements the "check" interface
+// Definition configures the behavior of the DNS check in the "check" interface
 type Definition struct {
 	// The IP of the DNS server to query
 	Server string `json:"server" optiontype:"required"`
@@ -24,8 +23,8 @@ type Definition struct {
 	Port uint16 `json:"port" default:"53"`
 	// The type of DNS record to query
 	RecordType string `json:"recordType" default:"A"`
-	// Timeout for the dns query in seconds
-	Timeout uint8 `json:"timeout" default:"20"`
+	// Shared configuration across all checks
+	checks.SharedDefinition
 }
 
 // Run a single instance of the check

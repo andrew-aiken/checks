@@ -15,7 +15,12 @@ type Checker interface {
 	Validate() (passed bool, message string)
 }
 
-// Return result of checks
+// SharedDefinition are default types embedded into all check definitions
+type SharedDefinition struct {
+	Timeout int `json:"timeout" default:"10"`
+}
+
+// Results is the return type of all checks
 type Results struct {
 	Details   map[string]string `json:"details"`
 	Message   string            `json:"message"`
@@ -23,13 +28,13 @@ type Results struct {
 	Timestamp time.Time         `json:"timestamp"`
 }
 
-// Fields for static configuration
+// StaticConf are types that are default accepted to be templated into checks
 type StaticConf struct {
 	TeamNumber    uint16 // TeamNumber
 	TeamNumberHex string // TeamNumberHex
 }
 
-// Templates the check object with team specific information
+// TemplateDefinition templates the check any object with team specific information
 func TemplateDefinition(def any, static StaticConf) ([]byte, error) {
 	definitionJSON, err := json.Marshal(def)
 	if err != nil {

@@ -8,7 +8,10 @@ import (
 )
 
 type Definition struct {
-	Pass bool `json:"pass" default:"true"` // Whether the check should pass
+	// Whether the check should pass
+	Pass bool `json:"pass" default:"true"`
+	// Shared configuration across all checks
+	checks.SharedDefinition
 }
 
 func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {

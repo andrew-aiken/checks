@@ -14,11 +14,11 @@ jobs:
       group: test-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # 7.0.0
         with:
           go-version-file: go.mod
 
@@ -31,4 +31,4 @@ jobs:
           fi
 
       - name: Run tests
-        run: go test -v ./...
+        run: go test -v -race ./...

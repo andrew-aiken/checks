@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"strings"
 	"testing"
@@ -244,8 +245,13 @@ func TestSSHRun(t *testing.T) {
 		CommandResponse: serverResponse,
 	})
 
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", serverHostName, serverPort))
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	go func() {
-		sshServer.ListenAndServe()
+		sshServer.Serve(listener)
 	}()
 	t.Cleanup(func() {
 		sshServer.Close()
@@ -396,8 +402,13 @@ func TestSSHKey(t *testing.T) {
 		CommandResponse: "handler triggered\n",
 	})
 
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", serverHostName, serverPort))
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	go func() {
-		sshServer.ListenAndServe()
+		sshServer.Serve(listener)
 	}()
 	t.Cleanup(func() {
 		sshServer.Close()
@@ -440,9 +451,9 @@ type TestSSH struct {
 	server *sshtest.Server
 }
 
-// ListenAndServe listens on the TCP network address srv.Addr and then calls Serve to handle incoming connections
-func (h *TestSSH) ListenAndServe() error {
-	return h.server.ListenAndServe()
+// Serve handles incoming connections on the already-bound listener l
+func (h *TestSSH) Serve(l net.Listener) error {
+	return h.server.Serve(l)
 }
 
 // Close returns any error returned from closing the Server's underlying Listener(s).

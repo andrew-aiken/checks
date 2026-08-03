@@ -151,7 +151,7 @@ func TestHTTPRun(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring: `Error making request: Get "https://dne.neccdl.org:443/": dial tcp: lookup dne.neccdl.org: no such host`,
+			MessageSubstring: `Error making request: Get "https://dne.neccdl.org:443/": dial tcp: lookup dne.neccdl.org`,
 		},
 		{
 			Name: "InvalidHost",

@@ -3,6 +3,7 @@ package ftp
 import (
 	"context"
 	"crypto/sha3"
+	"crypto/tls"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -24,6 +25,10 @@ type Definition struct {
 	Username string `json:"username" optiontype:"required"`
 	// The users password
 	Password string `json:"password"`
+	// Whether to secure the control and data connections with explicit TLS (FTPS, AUTH TLS)
+	TLS bool `json:"tls" default:"false"`
+	// Whether to skip verification of the server's TLS certificate
+	TLSSkipVerify bool `json:"tlsSkipVerify" default:"false"`
 	// File to retrieve from the server
 	// If empty just check the FTP connection
 	File string `json:"file"`
@@ -60,7 +65,15 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	}
 
 	connectionString := fmt.Sprintf("%s:%d", definition.Host, definition.Port)
-	conn, err := ftp.Dial(connectionString, ftp.DialWithContext(ctx))
+	dialOptions := []ftp.DialOption{ftp.DialWithContext(ctx)}
+	if definition.TLS {
+		tlsConfig := &tls.Config{
+			ServerName:         definition.Host,
+			InsecureSkipVerify: definition.TLSSkipVerify,
+		}
+		dialOptions = append(dialOptions, ftp.DialWithExplicitTLS(tlsConfig))
+	}
+	conn, err := ftp.Dial(connectionString, dialOptions...)
 	if err != nil {
 		result.Message = fmt.Sprintf("Connection to %s on port %d failed: '%s'", definition.Host, definition.Port, err)
 		return

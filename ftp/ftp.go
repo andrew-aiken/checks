@@ -69,7 +69,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	if definition.TLS {
 		tlsConfig := &tls.Config{
 			ServerName:         definition.Host,
-			InsecureSkipVerify: definition.TLSSkipVerify,
+			InsecureSkipVerify: definition.TLSSkipVerify, // #nosec G402
 		}
 		dialOptions = append(dialOptions, ftp.DialWithExplicitTLS(tlsConfig))
 	}

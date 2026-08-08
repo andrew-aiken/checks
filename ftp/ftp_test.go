@@ -267,7 +267,7 @@ func TestFTPConnection(t *testing.T) {
 func TestAnonymousFTP(t *testing.T) {
 	staticConfig := checks.StaticConf{}
 
-	var serverPort uint16 = 2122
+	var serverPort uint16 = 2121
 
 	username := "Anonymous"
 
@@ -305,7 +305,7 @@ func TestAnonymousFTP(t *testing.T) {
 func TestFTPSConnection(t *testing.T) {
 	staticConfig := checks.StaticConf{}
 
-	var serverPort uint16 = 2123
+	var serverPort uint16 = 2121
 
 	username := "dummy"
 	password := "dummy"

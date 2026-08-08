@@ -289,11 +289,14 @@ func TestAnonymousFTP(t *testing.T) {
 		Password: "",
 	}
 
+
 	ctx := context.Background()
 	timeoutContext, cxtCancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cxtCancel()
 
 	result := definition.Run(timeoutContext, staticConfig)
+	fmt.Println(result.Passed)
+	fmt.Println(result.Message)
 
 	if !result.Passed {
 		t.Fatal("Check failed to connect")

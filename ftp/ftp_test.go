@@ -289,7 +289,6 @@ func TestAnonymousFTP(t *testing.T) {
 		Password: "",
 	}
 
-
 	ctx := context.Background()
 	timeoutContext, cxtCancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cxtCancel()

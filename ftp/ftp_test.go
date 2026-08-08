@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -17,14 +18,12 @@ import (
 	ftpserver "github.com/fclairamb/ftpserverlib"
 )
 
-type ValidateTest struct {
-	Name            string
-	Definition      ftp.Definition
-	ValidateMessage string
-}
-
 func TestFTPValidate(t *testing.T) {
-	tests := []ValidateTest{
+	tests := []struct {
+		Name            string
+		Definition      ftp.Definition
+		ValidateMessage string
+	}{
 		{
 			Name: "Valid",
 			Definition: ftp.Definition{
@@ -86,9 +85,7 @@ func TestFTPConnection(t *testing.T) {
 	username := "dummy"
 	password := "dummy"
 
-	testFileContentBytes := []byte(`Hello world
-123
-`)
+	testFileContentBytes := []byte(`Hello world`)
 
 	digest := sha3.Sum256(testFileContentBytes)
 	digestString := hex.EncodeToString(digest[:])
@@ -97,48 +94,212 @@ func TestFTPConnection(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	driver := &testDriver{
+	server := ftpserver.NewFtpServer(&testDriver{
 		rootDir:  ftpDir,
 		username: username,
 		password: password,
 		settings: &ftpserver.Settings{
 			ListenAddr: fmt.Sprintf("127.0.0.1:%d", serverPort),
-			// PassiveTransferPortRange: &ftpserver.PortRange{
-			// 	Start: 21000,
-			// 	End:   21010,
-			// },
 		},
-	}
-
-	server := ftpserver.NewFtpServer(driver)
+	})
 
 	go server.ListenAndServe()
 	defer server.Stop()
 
-	config := ftp.Definition{
-		Host:             "127.0.0.1",
-		Port:             serverPort,
-		Username:         username,
-		Password:         password,
-		File:             fileName,
-		MatchContentHash: true,
-		Hash:             digestString,
-		MatchContent:     true,
-		ContentRegex:     `Hello[\s\S]*`,
+	tests := []struct {
+		Name             string
+		Definition       ftp.Definition
+		Result           checks.Results
+		MessageSubstring string
+	}{
+		{
+			Name: "FailureTemplateParse",
+			Definition: ftp.Definition{
+				Host:     "{{",
+				Port:     serverPort,
+				Username: username,
+				Password: password,
+			},
+			Result: checks.Results{
+				Passed: false,
+			},
+			MessageSubstring: "internal error templating definition",
+		},
+		{
+			Name: "SuccessfulFullCall",
+			Definition: ftp.Definition{
+				Host:             "127.0.0.1",
+				Port:             serverPort,
+				Username:         username,
+				Password:         password,
+				File:             fileName,
+				MatchContent:     true,
+				ContentRegex:     `Hello.*`,
+				MatchContentHash: true,
+				Hash:             digestString,
+			},
+			Result: checks.Results{
+				Passed: true,
+			},
+		},
+		{
+			Name: "SuccessfulSimple",
+			Definition: ftp.Definition{
+				Host:     "127.0.0.1",
+				Port:     serverPort,
+				Username: username,
+				Password: password,
+			},
+			Result: checks.Results{
+				Passed: true,
+			},
+		},
+		{
+			Name: "ConnectionTimeout",
+			Definition: ftp.Definition{
+				Host:     "127.0.0.1",
+				Port:     1337,
+				Username: username,
+				Password: password,
+			},
+			Result: checks.Results{
+				Passed: false,
+			},
+			MessageSubstring: "Connection to 127.0.0.1 on port 1337 failed",
+		},
+		{
+			Name: "FailedLogin",
+			Definition: ftp.Definition{
+				Host:     "127.0.0.1",
+				Port:     serverPort,
+				Username: "dne",
+				Password: password,
+			},
+			Result: checks.Results{
+				Passed: false,
+			},
+			MessageSubstring: "Login attempt with user dne failed",
+		},
+		{
+			Name: "FileDNE",
+			Definition: ftp.Definition{
+				Host:     "127.0.0.1",
+				Port:     serverPort,
+				Username: username,
+				Password: password,
+				File:     "dne.txt",
+			},
+			Result: checks.Results{
+				Passed: false,
+			},
+			MessageSubstring: "Could not retrieve file dne.txt",
+		},
+		{
+			Name: "InvalidRegex",
+			Definition: ftp.Definition{
+				Host:         "127.0.0.1",
+				Port:         serverPort,
+				Username:     username,
+				Password:     password,
+				File:         fileName,
+				MatchContent: true,
+				ContentRegex: "[a-z",
+			},
+			Result: checks.Results{
+				Passed: false,
+			},
+			MessageSubstring: "Error compiling regex string",
+		},
+		{
+			Name: "FailedRegexMatch",
+			Definition: ftp.Definition{
+				Host:         "127.0.0.1",
+				Port:         serverPort,
+				Username:     username,
+				Password:     password,
+				File:         fileName,
+				MatchContent: true,
+				ContentRegex: "DNE",
+			},
+			Result: checks.Results{
+				Passed: false,
+			},
+			MessageSubstring: "File contents does not match regex",
+		},
+		{
+			Name: "IncorrectHash",
+			Definition: ftp.Definition{
+				Host:             "127.0.0.1",
+				Port:             serverPort,
+				Username:         username,
+				Password:         password,
+				File:             fileName,
+				MatchContentHash: true,
+				Hash:             "FOO",
+			},
+			Result: checks.Results{
+				Passed: false,
+			},
+			MessageSubstring: "File content does not match hash",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			ctx := context.Background()
+			timeoutContext, cxtCancel := context.WithTimeout(ctx, 3*time.Second)
+			defer cxtCancel()
+
+			result := tt.Definition.Run(timeoutContext, staticConfig)
+
+			if result.Passed != tt.Result.Passed {
+				t.Fatalf("Check result does not match expected result(%q) message %t", tt.Name, result.Passed)
+			}
+
+			if tt.MessageSubstring != "" && !strings.Contains(result.Message, tt.MessageSubstring) {
+				t.Fatalf("Expected message substring %q for check(%q), got message %q", tt.MessageSubstring, tt.Name, result.Message)
+			}
+		})
+	}
+}
+
+// Connect to an FTP server without a password
+func TestAnonymousFTP(t *testing.T) {
+	staticConfig := checks.StaticConf{}
+
+	var serverPort uint16 = 2122
+
+	username := "Anonymous"
+
+	server := ftpserver.NewFtpServer(&testDriver{
+		rootDir:  t.TempDir(),
+		username: username,
+		settings: &ftpserver.Settings{
+			ListenAddr: fmt.Sprintf("127.0.0.1:%d", serverPort),
+		},
+	})
+
+	go server.ListenAndServe()
+	defer server.Stop()
+
+	definition :=ftp.Definition{
+			Host:     "127.0.0.1",
+			Port:     serverPort,
+			Username: username,
+			Password: "",
 	}
 
 	ctx := context.Background()
-	timeoutContext, _ := context.WithTimeout(ctx, 5*time.Second)
-	results := config.Run(timeoutContext, staticConfig)
+	timeoutContext, cxtCancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cxtCancel()
 
-	fmt.Println(results.Passed)
-	fmt.Println(results.Message)
-	for _, detail := range results.Details {
-		fmt.Println(detail)
-	}
+	result := definition.Run(timeoutContext, staticConfig)
 
-	if !results.Passed {
-		t.Fatal(results.Message)
+	fmt.Println(result.Passed)
+	fmt.Println(result.Message)
+
+	if !result.Passed {
+		t.Fatal("Check failed to connect")
 	}
 }
 

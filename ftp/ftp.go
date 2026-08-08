@@ -102,7 +102,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 			return
 		}
 		if !regex.Match(content) {
-			result.Message = "Text does not match regex"
+			result.Message = "File contents does not match regex"
 			return
 		}
 	}
@@ -114,9 +114,9 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 
 		// Check if the digest of the file matches the defined hash
 		if digestString := hex.EncodeToString(digest[:]); digestString != definition.Hash {
-			result.Message = "Incorrect file hash"
+			result.Message = "File content does not match hash"
 			result.Details["hash"] = digestString
-			return result
+			return
 		}
 	}
 

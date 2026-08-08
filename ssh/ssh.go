@@ -54,7 +54,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 
 	sshConfig := &ssh.ClientConfig{
 		User:            definition.Username,
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // #nosec G106
 		Timeout:         time.Duration(d.Timeout) * time.Second,
 	}
 

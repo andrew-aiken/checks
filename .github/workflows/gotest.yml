@@ -22,6 +22,13 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@9e75c0576c9878035d4221392108d458abe10fc3 # 2.28.0
+        with:
+          args: ./...
+        env:
+          GOTOOLCHAIN: auto
+
       - name: Check formatting
         run: |
           if [ -n "$(gofmt -l .)" ]; then

@@ -70,7 +70,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 		Transport: &http.Transport{
 			IdleConnTimeout: 10 * time.Second,
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: !d.VerifyCert,
+				InsecureSkipVerify: !d.VerifyCert, // #nosec G402
 			},
 		},
 		CheckRedirect: redirect,
@@ -128,7 +128,7 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 	defer resp.Body.Close()
 
 	// Check status code
-	if d.MatchCode && uint16(resp.StatusCode) != d.Code {
+	if d.MatchCode && resp.StatusCode != int(d.Code) {
 		return false, fmt.Errorf("Received bad status code: %d", resp.StatusCode)
 	}
 

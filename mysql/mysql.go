@@ -76,8 +76,8 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	defer db.Close()
 
 	db.SetMaxOpenConns(1)
-	db.SetConnMaxLifetime(time.Duration(definition.Timeout))
-	db.SetConnMaxIdleTime(time.Duration(definition.Timeout))
+	db.SetConnMaxLifetime(time.Duration(definition.Timeout) * time.Second)
+	db.SetConnMaxIdleTime(time.Duration(definition.Timeout) * time.Second)
 
 	// Check db connection
 	err = db.PingContext(ctx)

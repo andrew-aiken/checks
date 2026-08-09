@@ -1,9 +1,9 @@
 CREATE DATABASE test;
 
 -- Table to perform test queries against
-create table test.`table` (
-  username varchar(64) not null primary key,
-  age      int         null
+CREATE TABLE test.`table` (
+  username varchar(64) NOT NULL PRIMARY KEY,
+  age      int         NULL
 );
 
 -- Sample data

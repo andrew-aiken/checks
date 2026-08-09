@@ -143,7 +143,7 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 		// Check if body matches regex
 		regex, err := regexp.Compile(d.ContentRegex)
 		if err != nil {
-			return false, fmt.Errorf("Error compiling regex string %s : %s", d.ContentRegex, err)
+			return false, fmt.Errorf("Error compiling regex string: %s", err)
 		}
 		if !regex.Match(body) {
 			return false, fmt.Errorf("Received bad response body")

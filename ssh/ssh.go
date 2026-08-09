@@ -97,7 +97,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 		// Match some content
 		regex, err := regexp.Compile(d.ContentRegex)
 		if err != nil {
-			result.Message = fmt.Sprintf("Error compiling regex string %s : %s", d.ContentRegex, err)
+			result.Message = fmt.Sprintf("Error compiling regex string: %s", err)
 			return result
 		}
 

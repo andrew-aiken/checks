@@ -44,7 +44,7 @@ type Definition struct {
 	checks.SharedDefinition
 }
 
-// Run performs an FTP check
+// Run performs a FTP check
 func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result checks.Results) {
 	result = checks.Results{
 		Timestamp: time.Now(),
@@ -108,10 +108,9 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 
 	// Compare the files content against a regular expression
 	if definition.MatchContent {
-		// Check if body matches regex
 		regex, err := regexp.Compile(definition.ContentRegex)
 		if err != nil {
-			result.Message = fmt.Sprintf("Error compiling regex string %s: %s", definition.ContentRegex, err)
+			result.Message = fmt.Sprintf("Error compiling regex string: %s", err)
 			return
 		}
 		if !regex.Match(content) {

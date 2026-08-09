@@ -159,10 +159,10 @@ func TestMySQL(t *testing.T) {
 		{
 			Name: "NoPassword",
 			Definition: mysql.Definition{
-				Host:         databaseHost,
-				Port:         serverPort,
-				Username:     "no_password",
-				Database:     database,
+				Host:     databaseHost,
+				Port:     serverPort,
+				Username: "no_password",
+				Database: database,
 			},
 			Result: checks.Results{
 				Passed: true,

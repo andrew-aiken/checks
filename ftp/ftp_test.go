@@ -106,6 +106,8 @@ func TestFTPConnection(t *testing.T) {
 	go server.ListenAndServe()
 	defer server.Stop()
 
+	time.Sleep(500 * time.Millisecond)
+
 	tests := []struct {
 		Name             string
 		Definition       ftp.Definition
@@ -282,6 +284,8 @@ func TestAnonymousFTP(t *testing.T) {
 	go server.ListenAndServe()
 	defer server.Stop()
 
+	time.Sleep(500 * time.Millisecond)
+
 	definition := ftp.Definition{
 		Host:     "127.0.0.1",
 		Port:     serverPort,
@@ -327,6 +331,8 @@ func TestFTPSConnection(t *testing.T) {
 
 	go server.ListenAndServe()
 	defer server.Stop()
+
+	time.Sleep(500 * time.Millisecond)
 
 	tests := []struct {
 		Name             string

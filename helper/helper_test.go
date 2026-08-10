@@ -4,7 +4,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/andrew-aiken/checks/ftp"
 	"github.com/andrew-aiken/checks/helper"
+	"github.com/andrew-aiken/checks/mysql"
+	"github.com/andrew-aiken/checks/postgresql"
+	"github.com/andrew-aiken/checks/smtp"
+	"github.com/andrew-aiken/checks/tcp"
 
 	"github.com/andrew-aiken/checks/dns"
 	"github.com/andrew-aiken/checks/http"
@@ -22,10 +27,15 @@ type Test struct {
 func TestNewDefinition(t *testing.T) {
 	tests := []Test{
 		{"dns", &dns.Definition{}, false},
+		{"ftp", &ftp.Definition{}, false},
 		{"http", &http.Definition{}, false},
 		{"icmp", &icmp.Definition{}, false},
+		{"mysql", &mysql.Definition{}, false},
 		{"noop", &noop.Definition{}, false},
+		{"postgresql", &postgresql.Definition{}, false},
+		{"smtp", &smtp.Definition{}, false},
 		{"ssh", &ssh.Definition{}, false},
+		{"tcp", &tcp.Definition{}, false},
 		{"unknown", nil, true},
 		{"", nil, true},
 	}

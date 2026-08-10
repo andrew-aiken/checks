@@ -2,14 +2,16 @@ package smtp
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net"
 	"strings"
 	"time"
 
 	"github.com/andrew-aiken/checks"
 
-	sasl "github.com/emersion/go-sasl"
+	"github.com/emersion/go-sasl"
 	gosmtp "github.com/emersion/go-smtp"
 )
 
@@ -19,13 +21,21 @@ type Definition struct {
 	// TCP port number to connect to
 	Port uint16 `json:"port" default:"25"`
 	// User that is sending the email
-	Username string `json:"username" optiontype:"required"`
+	Username string `json:"username"`
 	// The users password
-	Password  string `json:"password"`
-	Sender    string `json:"sender" optiontype:"required"`
+	Password string `json:"password"`
+	// Sender email address
+	Sender string `json:"sender" optiontype:"required"`
+	// Recipient email address
 	Recipient string `json:"recipient" optiontype:"required"`
-	Body      string `json:"body" default:"Hello from Scorestack"`
-	Encrypted bool   `json:"encrypted" default:"false"`
+	// Subject of the email
+	Subject string `json:"subject" default:"Subject"`
+	// Body of the email
+	Body string `json:"body" default:"Body"`
+	// If the connection should be encrypted
+	Encrypted bool `json:"encrypted" default:"false"`
+	// Whether to verify the server's TLS certificate
+	SkipVerifyCert bool `json:"verifyCert"`
 	// Shared configuration across all checks
 	checks.SharedDefinition
 }
@@ -49,15 +59,52 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		return
 	}
 
-	auth := sasl.NewPlainClient("", "user@example.com", "password")
-
-	message := strings.NewReader(definition.Body)
-
 	address := fmt.Sprintf("%s:%d", definition.Host, definition.Port)
 
-	err = gosmtp.SendMail(address, auth, definition.Sender, []string{definition.Recipient}, message)
+	dialer := &net.Dialer{Timeout: time.Duration(definition.Timeout) * time.Second}
+	conn, err := dialer.DialContext(ctx, "tcp", address)
 	if err != nil {
-		result.Message = fmt.Sprintf("Failed to connect to SMTP server: %s", err)
+		result.Message = fmt.Sprintf("Failed to connect to SMTP %s: %s", address, err)
+		return
+	}
+
+	var client *gosmtp.Client
+	if definition.Encrypted {
+		tlsConfig := &tls.Config{
+			ServerName:         definition.Host,
+			InsecureSkipVerify: definition.SkipVerifyCert, // #nosec G402
+		}
+		client, err = gosmtp.NewClientStartTLS(conn, tlsConfig)
+		if err != nil {
+			result.Message = fmt.Sprintf("Failed to establish encrypted session with %s: %s", address, err)
+			return
+		}
+	} else {
+		client = gosmtp.NewClient(conn)
+	}
+	defer client.Close()
+
+	err = client.Noop()
+	if err != nil {
+		result.Message = fmt.Sprintf("Failed to noop ping to server: %s", err)
+		return
+	}
+
+	if definition.Username != "" {
+		auth := sasl.NewPlainClient("", definition.Username, definition.Password)
+		if err = client.Auth(auth); err != nil {
+			result.Message = fmt.Sprintf("Failed to authenticate as %s: %s", definition.Username, err)
+			return
+		}
+	}
+
+	// https://datatracker.ietf.org/doc/html/rfc822
+	message := fmt.Sprintf("Subject: %s\n\n%s\n\n", definition.Subject, definition.Body)
+
+	messageReader := strings.NewReader(message)
+	if err = client.SendMail(definition.Sender, []string{definition.Recipient}, messageReader); err != nil {
+		result.Message = fmt.Sprintf("Failed to send mail: %s", err)
+		return
 	}
 
 	result.Passed = true

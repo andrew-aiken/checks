@@ -74,6 +74,8 @@ func TestTCPCheck(t *testing.T) {
 
 	go tcpServer(host, port, "read")
 
+	time.Sleep(500 * time.Millisecond)
+
 	tests := []struct {
 		Name             string
 		Definition       tcp.Definition

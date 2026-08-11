@@ -16,7 +16,7 @@ func TestPostgresql(t *testing.T) {
 	// No simple go libraries for spinning up a local postgresql server
 	// This test relies on an external server
 	if os.Getenv("CI_POSTGRESQL") == "" {
-		t.Skip("postgresql server test flag missing")
+		t.Skip("CI_POSTGRESQL test flag not set")
 	}
 
 	staticConfig := checks.StaticConf{}

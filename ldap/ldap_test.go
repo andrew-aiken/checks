@@ -13,7 +13,7 @@ import (
 
 func TestLDAP(t *testing.T) {
 	if os.Getenv("CI_LDAP") == "" {
-		t.Skip("LDAP server test flag missing")
+		t.Skip("CI_LDAP test flag not set")
 	}
 
 	staticConfig := checks.StaticConf{}

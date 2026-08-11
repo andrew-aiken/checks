@@ -14,7 +14,7 @@ import (
 func TestSMTP(t *testing.T) {
 	// This test relies on an external smtp server
 	if os.Getenv("CI_SMTP") == "" {
-		t.Skip("SMTP test flag not set")
+		t.Skip("CI_SMTP test flag not set")
 	}
 
 	var port uint16 = 1025

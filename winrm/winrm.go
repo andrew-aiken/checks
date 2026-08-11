@@ -12,7 +12,6 @@ import (
 	"github.com/andrew-aiken/checks"
 
 	winrmClient "github.com/masterzen/winrm"
-	// "golang.org/x/crypto/ssh"
 )
 
 type Definition struct {
@@ -20,24 +19,26 @@ type Definition struct {
 	Host string `json:"host" optiontype:"required"`
 	// TCP port number to connect to
 	Port uint16 `json:"port" default:"5985"`
-	// TODO, see if other methods work, might just be only ntlm
-	TransportProtocol string `json:"transportProtocol" default:"ntlm"`
-	Insecure          bool   `json:"insecure" default:"false"`
-	Command           string `json:"command" default:"whoami"`
-	// User to login to
+	// User being logged into
 	Username string `json:"username" optiontype:"required"`
 	// The users password
 	Password string `json:"password" optiontype:"required"`
-	// // If the connection should be encrypted
+	// Command to run against the target host
+	Command string `json:"command" default:"whoami"`
+	// Method of authentication, currently only ntlm and kerberos are supported
+	TransportProtocol string `json:"transportProtocol" default:"ntlm"`
+	// If the connection should be encrypted
 	Encrypted bool `json:"encrypted" default:"false"`
+	// Allow the connection to go over insecure connections
+	Insecure bool `json:"insecure" default:"false"`
 	// whether the response body must match a defined regex for the check to pass
 	MatchContent bool `json:"matchContent"`
 	// regex for the response body to match
 	ContentRegex string `json:"contentRegex" default:".*"`
-
+	// Hostname, used when connecting with kerberos
 	Hostname string `json:"hostname"`
-	Realm    string `json:"realm"`
-
+	// Realm, used when connecting with kerberos
+	Realm string `json:"realm"`
 	// Shared configuration across all checks
 	checks.SharedDefinition
 }
@@ -105,20 +106,6 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 					SPN:      fmt.Sprintf("%s/%s", strings.ToUpper(protocol), definition.Hostname),
 				}
 			}
-			// This tunnels through another host? not connects to the windows directly
-			// case "ssh":
-			// 	address := fmt.Sprintf("%s:22", definition.Host) // Hardcoded SSH port
-			// 	sshClient, err := ssh.Dial("tcp", address, &ssh.ClientConfig{
-			// 		User:            definition.Username,
-			// 		Auth:            []ssh.AuthMethod{ssh.Password(definition.Password)},
-			// 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // #nosec G106
-			// 	})
-			// 	if err != nil {
-			// 		fmt.Println(err)
-			// 		errChan <- fmt.Errorf("Failed to set SSH dialer: %v", err)
-			// 		return
-			// 	}
-			// 	params.Dial = sshClient.Dial
 		}
 
 		client, err := winrmClient.NewClientWithParameters(endpoint, definition.Username, definition.Password, params)
@@ -191,6 +178,12 @@ func (d Definition) Validate() (passed bool, message string) {
 
 	if d.TransportProtocol == "kerberos" && (d.Hostname == "" || d.Realm == "") {
 		return false, "When running in Kerberos mode hostname & realm must be set"
+	}
+
+	if d.MatchContent && d.ContentRegex != "" {
+		if _, err := regexp.Compile(d.ContentRegex); err != nil {
+			return false, "Failed to compile regex"
+		}
 	}
 
 	return true, ""

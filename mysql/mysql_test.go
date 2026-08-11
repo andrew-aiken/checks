@@ -16,7 +16,7 @@ func TestMySQL(t *testing.T) {
 	// No simple go libraries for spinning up a local MySQL server
 	// This test relies on an external server
 	if os.Getenv("CI_MYSQL") == "" {
-		t.Skip("MySQL server test flag missing")
+		t.Skip("CI_MYSQL test flag not set")
 	}
 
 	staticConfig := checks.StaticConf{}

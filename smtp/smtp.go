@@ -35,7 +35,7 @@ type Definition struct {
 	// If the connection should be encrypted
 	Encrypted bool `json:"encrypted" default:"false"`
 	// Whether to verify the server's TLS certificate
-	SkipVerifyCert bool `json:"verifyCert"`
+	SkipVerifyCert bool `json:"skipVerifyCert" default:"false"`
 	// Shared configuration across all checks
 	checks.SharedDefinition
 }

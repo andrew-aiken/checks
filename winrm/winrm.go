@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -82,7 +83,6 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 			params.TransportDecorator = func() winrmClient.Transporter {
 				encryption, err := winrmClient.NewEncryption("ntlm")
 				if err != nil {
-					fmt.Println(err)
 					errChan <- fmt.Errorf("Failed to set NTLM transport protocol: %v", err)
 					return nil
 				}
@@ -105,38 +105,35 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 					SPN:      fmt.Sprintf("%s/%s", strings.ToUpper(protocol), definition.Hostname),
 				}
 			}
-		// This tunnels through another host? not connects to the windows directly
-		// case "ssh":
-		// 	address := fmt.Sprintf("%s:22", definition.Host) // Hardcoded SSH port
-		// 	sshClient, err := ssh.Dial("tcp", address, &ssh.ClientConfig{
-		// 		User:            definition.Username,
-		// 		Auth:            []ssh.AuthMethod{ssh.Password(definition.Password)},
-		// 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // #nosec G106
-		// 	})
-		// 	if err != nil {
-		// 		fmt.Println(err)
-		// 		errChan <- fmt.Errorf("Failed to set SSH dialer: %v", err)
-		// 		return
-		// 	}
-		// 	params.Dial = sshClient.Dial
+			// This tunnels through another host? not connects to the windows directly
+			// case "ssh":
+			// 	address := fmt.Sprintf("%s:22", definition.Host) // Hardcoded SSH port
+			// 	sshClient, err := ssh.Dial("tcp", address, &ssh.ClientConfig{
+			// 		User:            definition.Username,
+			// 		Auth:            []ssh.AuthMethod{ssh.Password(definition.Password)},
+			// 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // #nosec G106
+			// 	})
+			// 	if err != nil {
+			// 		fmt.Println(err)
+			// 		errChan <- fmt.Errorf("Failed to set SSH dialer: %v", err)
+			// 		return
+			// 	}
+			// 	params.Dial = sshClient.Dial
 		}
 
 		client, err := winrmClient.NewClientWithParameters(endpoint, definition.Username, definition.Password, params)
 		if err != nil {
-			fmt.Println(err)
 			errChan <- fmt.Errorf("failed to create client: %v", err)
 			return
 		}
 
 		output, stderr, _, err := client.RunCmdWithContext(ctx, definition.Command)
 		if err != nil {
-			fmt.Println(err)
 			errChan <- fmt.Errorf("failed to run command: %v", err)
 			return
 		}
 
 		if stderr != "" {
-			fmt.Println(stderr)
 			errChan <- fmt.Errorf("command returned error: %s", stderr)
 			return
 		}
@@ -156,11 +153,14 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 
 	select {
 	case <-ctx.Done():
-		fmt.Println(ctx.Err())
-		fmt.Println("PASS")
+		if ctx.Err() != nil {
+			result.Message = ctx.Err().Error()
+		} else {
+			result.Message = "Context closed: could have timed out?"
+		}
+		return
 	case err := <-errChan:
 		if err != nil {
-			fmt.Println("ERROR")
 			result.Message = err.Error()
 			return
 		}
@@ -182,6 +182,15 @@ func (d Definition) Validate() (passed bool, message string) {
 
 	if d.Password == "" {
 		return false, "Password needs to be defined"
+	}
+
+	allowedTransportProtocol := []string{"", "ntlm", "kerberos"}
+	if !slices.Contains(allowedTransportProtocol, d.TransportProtocol) {
+		return false, "Invalid transport protocol option"
+	}
+
+	if d.TransportProtocol == "kerberos" && (d.Hostname == "" || d.Realm == "") {
+		return false, "When running in Kerberos mode hostname & realm must be set"
 	}
 
 	return true, ""

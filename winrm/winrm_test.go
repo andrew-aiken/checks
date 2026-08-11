@@ -25,13 +25,19 @@ func TestWinrm(t *testing.T) {
 
 	config := winrm.Definition{
 		Host:     host,
-		Username: "Administrator",
-		Password: "M09@QKqKhIjFMXxKHG1M!NvamNST4*T7",
 		Port:     5985,
 		Command:  "whoami",
-		TransportProtocol: "ntlm",
 		MatchContent: true,
-		ContentRegex: `ec2amaz-sf7nb60\\administrator.*`,
+		// Username: "Administrator",
+		// Password: "M09@QKqKhIjFMXxKHG1M!NvamNST4*T7",
+		// TransportProtocol: "ntlm",
+		// ContentRegex: `ec2amaz-sf7nb60\\administrator.*`,
+		Username: "johndoe",
+		Password: "XHM5pwf-hbz0bzw-hnh2",
+		ContentRegex: `corp\\johndoe.*`,
+		TransportProtocol: "kerberos",
+		Realm: "CORP.EXAMPLE.ORG",
+		Hostname: "EC2AMAZ-SF7NB60",
 	}
 
 	results := config.Run(timeoutContext, staticConf)

@@ -88,21 +88,20 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 				}
 				return encryption
 			}
-		// WIP
 		case "kerberos":
 			params.TransportDecorator = func() winrmClient.Transporter {
 				protocol := "http"
 				if definition.Encrypted {
 					protocol = "https"
 				}
-				return &winrmClient.ClientKerberos{
+				return &kerberosTransport{
 					Username: definition.Username,
 					Password: definition.Password,
 					Hostname: definition.Hostname,
 					Realm:    definition.Realm,
+					KDCHost:  definition.Host,
 					Port:     int(definition.Port),
 					Proto:    protocol,
-					KrbConf:  "/etc/krb5.conf", // TODO what does this need to be?
 					SPN:      fmt.Sprintf("%s/%s", strings.ToUpper(protocol), definition.Hostname),
 				}
 			}

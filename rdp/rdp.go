@@ -13,14 +13,21 @@ import (
 )
 
 type Definition struct {
-	Host string
-	Port uint16
-	Username string
-	Password string
-	Domain string
+	// Server host being connected to
+	Host string `json:"host" optiontype:"required"`
+	// RDP connection port
+	Port uint16 `json:"port" default:"3389"`
+	// User connecting to the server
+	Username string `json:"username" optiontype:"required"`
+	// Users password
+	Password string `json:"password" optiontype:"required"`
+	// Domain if connecting with an AD user
+	Domain string `json:"domain"`
+	// Shared configuration across all checks
 	checks.SharedDefinition
 }
 
+// Run performs an RDP connection check
 func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result checks.Results) {
 	result = checks.Results{Timestamp: time.Now()}
 
@@ -42,10 +49,10 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	if okay {
 		dialTimeout = time.Until(deadlineTime)
 	} else {
-		dialTimeout = 10*time.Second
+		dialTimeout = 10 * time.Second
 	}
 
-	width, height := 1280, 800
+	var width, height = 1920, 1080
 	address := fmt.Sprintf("%s:%d", definition.Host, definition.Port)
 
 	client := grdp.NewRdpClient(address, width, height, func(address string) (net.Conn, error) {
@@ -54,6 +61,16 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	defer client.Close()
 
 	client.SetKeyboardLayout("US")
+	client.DisableAVC444()
+
+	connectionErr := make(chan error, 1)
+	reportConnectionErr := func(err error) {
+		select {
+		case connectionErr <- err:
+		default:
+		}
+	}
+	client.OnError(reportConnectionErr)
 
 	err = client.Login(definition.Domain, definition.Username, definition.Password)
 	if err != nil {
@@ -61,12 +78,38 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		return
 	}
 
-	client.KeyDown(65)
+	checkConnection := func() error {
+		select {
+		case err := <-connectionErr:
+			return err
+		default:
+			return nil
+		}
+	}
 
-	client.Reconnect(1920, 1080)
-
-	client.MouseMove(1, 1)
+	time.Sleep(500 * time.Millisecond)
+	if err := checkConnection(); err != nil {
+		result.Message = fmt.Sprintf("connection encountered errors: %v", err)
+		return
+	}
 
 	result.Passed = true
 	return
+}
+
+// Validate checks if the rdp definition is valid
+func (d Definition) Validate() (passed bool, message string) {
+	if d.Host == "" {
+		return false, "Host needs to be defined"
+	}
+
+	if d.Username == "" {
+		return false, "Username needs to be defined"
+	}
+
+	if d.Password == "" {
+		return false, "Password needs to be defined"
+	}
+
+	return true, ""
 }

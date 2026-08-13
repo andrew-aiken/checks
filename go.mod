@@ -17,6 +17,7 @@ require (
 	github.com/jlaffaye/ftp v0.2.2
 	github.com/masterzen/winrm v0.0.0-20260407182533-5570be7f80cf
 	github.com/miekg/dns v1.1.72
+	github.com/nakagami/grdp v0.9.6
 	github.com/prometheus-community/pro-bing v0.9.1
 	github.com/spf13/afero v1.15.0
 	golang.org/x/crypto v0.54.0
@@ -58,6 +59,7 @@ require (
 	github.com/jfjallid/ndr v0.1.1 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
+	github.com/lunixbochs/struc v0.0.0-20200707160740-784aaebc1d40 // indirect
 	github.com/masterzen/simplexml v0.0.0-20190410153822-31eea3082786 // indirect
 	github.com/pjbgf/sha1cd v0.6.0 // indirect
 	github.com/rogpeppe/go-internal v1.16.0 // indirect

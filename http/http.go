@@ -106,7 +106,7 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 	// Construct request
 	req, err := http.NewRequestWithContext(ctx, d.Method, url, strings.NewReader(d.Body))
 	if err != nil {
-		return false, fmt.Errorf("Error constructing request: %s", err)
+		return false, fmt.Errorf("error constructing request: %w", err)
 	}
 
 	// Handle Host header specially if present
@@ -123,13 +123,13 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 	// Send request
 	resp, err := client.Do(req)
 	if err != nil {
-		return false, fmt.Errorf("Error making request: %s", err)
+		return false, fmt.Errorf("error making request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	// Check status code
 	if d.MatchCode && resp.StatusCode != int(d.Code) {
-		return false, fmt.Errorf("Received bad status code: %d", resp.StatusCode)
+		return false, fmt.Errorf("received bad status code: %d", resp.StatusCode)
 	}
 
 	// Check body content
@@ -137,16 +137,16 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 		// Read response body
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return false, fmt.Errorf("Received error when reading response body: %s", err)
+			return false, fmt.Errorf("received error when reading response body: %w", err)
 		}
 
 		// Check if body matches regex
 		regex, err := regexp.Compile(d.ContentRegex)
 		if err != nil {
-			return false, fmt.Errorf("Error compiling regex string: %s", err)
+			return false, fmt.Errorf("error compiling regex string: %w", err)
 		}
 		if !regex.Match(body) {
-			return false, fmt.Errorf("Received bad response body")
+			return false, fmt.Errorf("received bad response body")
 		}
 	}
 

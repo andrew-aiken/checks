@@ -221,7 +221,12 @@ func tcpServer(host string, port uint16, mode string) {
 		fmt.Printf("Failed to start TCP listener: %s\n", err)
 		return
 	}
-	defer listener.Close()
+	defer func() {
+		err = listener.Close()
+		if err != nil {
+			fmt.Printf("Error closing tcp listener: %s\n", err.Error())
+		}
+	}()
 
 	for {
 		conn, err := listener.Accept()
@@ -238,7 +243,11 @@ func tcpServer(host string, port uint16, mode string) {
 				fmt.Println(message)
 			}
 		case "read":
-			conn.Write([]byte(tcpServerOutput))
+			_, err = conn.Write([]byte(tcpServerOutput))
+			if err != nil {
+				fmt.Printf("Failed to write bytes out: %s\n", err)
+				return
+			}
 		default:
 			fmt.Println("Unknown tcp server mode")
 			return

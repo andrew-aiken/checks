@@ -461,21 +461,11 @@ func (h *TestSSH) Close() error {
 	return h.server.Close()
 }
 
-// SetReturnString takes in a string and set it as the response from the server
-func (h *TestSSH) SetReturnString(str string) {
-	h.server.Handler = func(s sshtest.Session) {
-		io.WriteString(s, str)
-	}
-}
-
 func (h *TestSSH) SetupTestServer(config TestConfig) {
 	h.server = &sshtest.Server{
 		Addr: config.Address,
 		PasswordHandler: func(ctx sshtest.Context, password string) bool {
-			if config.Password == password {
-				return true
-			}
-			return false
+			return config.Password == password
 		},
 		PublicKeyHandler: func(ctx sshtest.Context, clientPublicKey sshtest.PublicKey) bool {
 			serverPublicKey, _, _, _, err := gossh.ParseAuthorizedKey([]byte(config.PublicKey))
@@ -492,7 +482,10 @@ func (h *TestSSH) SetupTestServer(config TestConfig) {
 			return false
 		},
 		Handler: func(s sshtest.Session) {
-			io.WriteString(s, config.CommandResponse)
+			_, err := io.WriteString(s, config.CommandResponse)
+			if err != nil {
+				fmt.Printf("Error generating ssh command response")
+			}
 		},
 	}
 }

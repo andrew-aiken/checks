@@ -30,7 +30,7 @@ This project provides unified checks that can be consumed across a wide variety 
 | [MySQL](mysql/)           |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | POP3                      |                       ✅                        |                           ⭕                           |                      ⭕                       |   ⭕   |
 | [PostgreSQL](postgresql/) |                       ⭕                        |                           ✅                           |                      ⭕                       |   ✅   |
-| RDP                       |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
+| [RDP](rdp/)               |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [SMB](smb/)               |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [SMTP](smtp/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [SSH](ssh/)               |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |

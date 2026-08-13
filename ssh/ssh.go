@@ -55,10 +55,10 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	sshConfig := &ssh.ClientConfig{
 		User:            definition.Username,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // #nosec G106
-		Timeout:         time.Duration(d.Timeout) * time.Second,
+		Timeout:         time.Duration(definition.Timeout) * time.Second,
 	}
 
-	sshConfig.Auth, err = d.generateAuth()
+	sshConfig.Auth, err = definition.generateAuth()
 	if err != nil {
 		result.Message = fmt.Sprintf("Error when generating ssh auth: %s", err)
 		return
@@ -107,7 +107,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 
 	if definition.MatchContent {
 		// Match some content
-		regex, err := regexp.Compile(d.ContentRegex)
+		regex, err := regexp.Compile(definition.ContentRegex)
 		if err != nil {
 			result.Message = fmt.Sprintf("Error compiling regex string: %s", err)
 			return

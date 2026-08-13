@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -45,21 +46,33 @@ type Definition struct {
 	checks.SharedDefinition
 }
 
-func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
-	// Initialize empty result
-	result := checks.Results{Timestamp: time.Now()}
+func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result checks.Results) {
+	result = checks.Results{Timestamp: time.Now()}
+
+	definitionBytes, err := checks.TemplateDefinition(d, static)
+	if err != nil {
+		result.Message = fmt.Sprintf("internal error templating definition: %s", err)
+		return
+	}
+
+	var definition Definition
+	err = json.Unmarshal(definitionBytes, &definition)
+	if err != nil {
+		result.Message = fmt.Sprintf("internal error unmarshaling templated definition: %s", err)
+		return
+	}
 
 	// Configure HTTP client
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
 		result.Message = "Could not create CookieJar"
-		return result
+		return
 	}
 
 	var redirect func(req *http.Request, via []*http.Request) error
 
 	// If redirects are not allowed, set the redirect function to prevent following them
-	if !d.Redirect {
+	if !definition.Redirect {
 		redirect = func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		}
@@ -70,15 +83,15 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 		Transport: &http.Transport{
 			IdleConnTimeout: 10 * time.Second,
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: !d.VerifyCert, // #nosec G402
+				InsecureSkipVerify: !definition.VerifyCert, // #nosec G402
 			},
 		},
 		CheckRedirect: redirect,
-		Timeout:       time.Duration(d.Timeout) * time.Second,
+		Timeout:       time.Duration(definition.Timeout) * time.Second,
 	}
 
 	// TODO: create child context with deadline less than the parent context
-	pass, err := d.request(ctx, client)
+	pass, err := definition.request(ctx, client)
 
 	// Process request results
 	result.Passed = pass

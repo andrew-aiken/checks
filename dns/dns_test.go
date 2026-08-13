@@ -90,6 +90,19 @@ func TestDNSRun(t *testing.T) {
 			MessageSubstring: "Unknown record type",
 		},
 		{
+			Name: "InvalidRegex",
+			Definition: dns.Definition{
+				Server:         "1.1.1.1",
+				Fqdn:           "example.com",
+				ExpectedResult: "{{",
+				RecordType:     "DNE",
+			},
+			Result: checks.Results{
+				Passed: false,
+			},
+			MessageSubstring: "internal error templating definition",
+		},
+		{
 			Name: "BadQuery",
 			Definition: dns.Definition{
 				Server:         "1.1.1.1.1",

@@ -2,6 +2,8 @@ module github.com/andrew-aiken/checks
 
 go 1.26.5
 
+replace github.com/nakagami/grdp => github.com/andrew-aiken/grdp v0.0.0-20260813144707-1e14be631b37
+
 require (
 	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6
 	github.com/emersion/go-smtp v0.24.0

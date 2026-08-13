@@ -251,14 +251,14 @@ func TestSSHRun(t *testing.T) {
 	}
 
 	go func() {
-		err = sshServer.Serve(listener)
-		if err != nil && err.Error() != "ssh: Server closed" {
-			fmt.Printf("Error serving ssh server: %s\n", err.Error())
+		serverErr := sshServer.Serve(listener)
+		if serverErr != nil && serverErr.Error() != "ssh: Server closed" {
+			fmt.Printf("Error serving ssh server: %s\n", serverErr.Error())
 		}
 	}()
 	t.Cleanup(func() {
-		if err = sshServer.Close(); err != nil {
-			fmt.Printf("Error stopping ssh server: %s\n", err.Error())
+		if sshCloseErr := sshServer.Close(); sshCloseErr != nil {
+			fmt.Printf("Error stopping ssh server: %s\n", sshCloseErr.Error())
 		}
 	})
 
@@ -413,14 +413,14 @@ func TestSSHKey(t *testing.T) {
 	}
 
 	go func() {
-		err = sshServer.Serve(listener)
-		if err != nil && err.Error() != "ssh: Server closed" {
-			fmt.Printf("Error serving ssh server: %s\n", err.Error())
+		serverErr := sshServer.Serve(listener)
+		if serverErr != nil && serverErr.Error() != "ssh: Server closed" {
+			fmt.Printf("Error serving ssh server: %s\n", serverErr.Error())
 		}
 	}()
 	t.Cleanup(func() {
-		if err = sshServer.Close(); err != nil {
-			fmt.Printf("Error stopping ssh server: %s\n", err.Error())
+		if sshCloseErr := sshServer.Close(); sshCloseErr != nil {
+			fmt.Printf("Error stopping ssh server: %s\n", sshCloseErr.Error())
 		}
 	})
 

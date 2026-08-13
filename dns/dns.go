@@ -2,6 +2,7 @@ package dns
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -28,35 +29,47 @@ type Definition struct {
 }
 
 // Run a single instance of the check
-func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
-	// Initialize empty result
-	result := checks.Results{Timestamp: time.Now()}
+func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result checks.Results) {
+	result = checks.Results{Timestamp: time.Now()}
 
-	recordType, ok := dns.StringToType[d.RecordType]
+	definitionBytes, err := checks.TemplateDefinition(d, static)
+	if err != nil {
+		result.Message = fmt.Sprintf("internal error templating definition: %s", err)
+		return
+	}
+
+	var definition Definition
+	err = json.Unmarshal(definitionBytes, &definition)
+	if err != nil {
+		result.Message = fmt.Sprintf("internal error unmarshaling templated definition: %s", err)
+		return
+	}
+
+	recordType, ok := dns.StringToType[definition.RecordType]
 	if !ok {
-		result.Message = fmt.Sprintf("Unknown record type: %s", d.RecordType)
-		return result
+		result.Message = fmt.Sprintf("Unknown record type: %s", definition.RecordType)
+		return
 	}
 
 	// Setup for dns query
 	var msg dns.Msg
-	msg.SetQuestion(dns.Fqdn(d.Fqdn), recordType)
+	msg.SetQuestion(dns.Fqdn(definition.Fqdn), recordType)
 
 	// Make it obey timeout via deadline
-	deadctx, cancel := context.WithDeadline(ctx, time.Now().Add(time.Duration(d.Timeout)*time.Second))
+	deadctx, cancel := context.WithDeadline(ctx, time.Now().Add(time.Duration(definition.Timeout)*time.Second))
 	defer cancel()
 
 	// Send the query
-	in, err := dns.ExchangeContext(deadctx, &msg, fmt.Sprintf("%s:%d", d.Server, d.Port))
+	in, err := dns.ExchangeContext(deadctx, &msg, fmt.Sprintf("%s:%d", definition.Server, definition.Port))
 	if err != nil {
-		result.Message = fmt.Sprintf("Problem sending query to %s : %s", d.Server, err)
-		return result
+		result.Message = fmt.Sprintf("Problem sending query to %s : %s", definition.Server, err)
+		return
 	}
 
 	// Check if we got any records
 	if len(in.Answer) < 1 {
-		result.Message = fmt.Sprintf("No records received from %s", d.Server)
-		return result
+		result.Message = fmt.Sprintf("No records received from %s", definition.Server)
+		return
 	}
 
 	// Loop through results and check for correct match
@@ -68,15 +81,15 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 		// Extract record value by parsing the string format: name\tttl\tclass\ttype\tvalue
 		parts := strings.SplitN(answer.String(), "\t", 5)
 
-		if len(parts) >= 5 && strings.Trim(parts[4], "\"") == d.ExpectedResult {
+		if len(parts) >= 5 && strings.Trim(parts[4], "\"") == definition.ExpectedResult {
 			result.Passed = true
-			return result
+			return
 		}
 	}
 
 	// If we reach here no records matched expected IP and check fails
 	result.Message = "Incorrect Records Returned"
-	return result
+	return
 }
 
 // Validats the dns definition is valid

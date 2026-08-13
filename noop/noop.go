@@ -14,13 +14,12 @@ type Definition struct {
 	checks.SharedDefinition
 }
 
-func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
-	result := checks.Results{
+// Run performs a noop check
+func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result checks.Results) {
+	return checks.Results{
 		Timestamp: time.Now(),
 		Passed:    d.Pass,
 	}
-
-	return result
 }
 
 // Validats the noop definition is valid

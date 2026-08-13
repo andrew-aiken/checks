@@ -84,7 +84,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 			params.TransportDecorator = func() winrmClient.Transporter {
 				encryption, err := winrmClient.NewEncryption("ntlm")
 				if err != nil {
-					errChan <- fmt.Errorf("Failed to set NTLM transport protocol: %v", err)
+					errChan <- fmt.Errorf("failed to set NTLM transport protocol: %w", err)
 					return nil
 				}
 				return encryption
@@ -110,29 +110,29 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 
 		client, err := winrmClient.NewClientWithParameters(endpoint, definition.Username, definition.Password, params)
 		if err != nil {
-			errChan <- fmt.Errorf("failed to create client: %v", err)
+			errChan <- fmt.Errorf("failed to create client: %w", err)
 			return
 		}
 
 		output, stderr, _, err := client.RunCmdWithContext(ctx, definition.Command)
 		if err != nil {
-			errChan <- fmt.Errorf("failed to run command: %v", err)
+			errChan <- fmt.Errorf("failed to run command: %w", err)
 			return
 		}
 
 		if stderr != "" {
-			errChan <- fmt.Errorf("command returned error: %s", stderr)
+			errChan <- fmt.Errorf("command returned error: %v", stderr)
 			return
 		}
 
 		if definition.MatchContent {
 			regex, err := regexp.Compile(definition.ContentRegex)
 			if err != nil {
-				errChan <- fmt.Errorf("Error compiling regex string: %s", err)
+				errChan <- fmt.Errorf("error compiling regex string: %w", err)
 				return
 			}
 			if !regex.Match([]byte(output)) {
-				errChan <- fmt.Errorf("Matching content not found")
+				errChan <- fmt.Errorf("matching content not found")
 				return
 			}
 		}

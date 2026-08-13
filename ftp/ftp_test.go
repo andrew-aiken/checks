@@ -103,8 +103,17 @@ func TestFTPConnection(t *testing.T) {
 		},
 	})
 
-	go server.ListenAndServe()
-	defer server.Stop()
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			fmt.Printf("Error starting FTP server: %s", err.Error())
+		}
+	}()
+
+	defer func() {
+		if err := server.Stop(); err != nil {
+			fmt.Printf("Error stopping FTP server: %s", err.Error())
+		}
+	}()
 
 	time.Sleep(500 * time.Millisecond)
 
@@ -281,8 +290,17 @@ func TestAnonymousFTP(t *testing.T) {
 		},
 	})
 
-	go server.ListenAndServe()
-	defer server.Stop()
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			fmt.Printf("Error starting FTP server: %s", err.Error())
+		}
+	}()
+
+	defer func() {
+		if err := server.Stop(); err != nil {
+			fmt.Printf("Error stopping FTP server: %s", err.Error())
+		}
+	}()
 
 	time.Sleep(500 * time.Millisecond)
 
@@ -298,16 +316,13 @@ func TestAnonymousFTP(t *testing.T) {
 	defer cxtCancel()
 
 	result := definition.Run(timeoutContext, staticConfig)
-	fmt.Println(result.Passed)
-	fmt.Println(result.Message)
 
 	if !result.Passed {
 		t.Fatal("Check failed to connect")
 	}
 }
 
-// TestFTPSConnection verifies the check can connect over explicit TLS (AUTH TLS)
-// and that a plaintext connection is rejected when TLS is mandatory
+// TestFTPSConnection verifies the check can connect over explicit TLS
 func TestFTPSConnection(t *testing.T) {
 	staticConfig := checks.StaticConf{}
 
@@ -329,8 +344,17 @@ func TestFTPSConnection(t *testing.T) {
 		tls:      true,
 	})
 
-	go server.ListenAndServe()
-	defer server.Stop()
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			fmt.Printf("Error starting FTP server: %s", err.Error())
+		}
+	}()
+
+	defer func() {
+		if err := server.Stop(); err != nil {
+			fmt.Printf("Error stopping FTP server: %s", err.Error())
+		}
+	}()
 
 	time.Sleep(500 * time.Millisecond)
 

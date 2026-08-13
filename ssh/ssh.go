@@ -36,32 +36,32 @@ type Definition struct {
 	checks.SharedDefinition
 }
 
-func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
-	result := checks.Results{Timestamp: time.Now()}
+func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result checks.Results) {
+	result = checks.Results{Timestamp: time.Now()}
 
 	definitionBytes, err := checks.TemplateDefinition(d, static)
 	if err != nil {
 		result.Message = fmt.Sprintf("internal error templating definition: %s", err)
-		return result
+		return
 	}
 
 	var definition Definition
 	err = json.Unmarshal(definitionBytes, &definition)
 	if err != nil {
 		result.Message = fmt.Sprintf("internal error unmarshaling templated definition: %s", err)
-		return result
+		return
 	}
 
 	sshConfig := &ssh.ClientConfig{
 		User:            definition.Username,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // #nosec G106
-		Timeout:         time.Duration(d.Timeout) * time.Second,
+		Timeout:         time.Duration(definition.Timeout) * time.Second,
 	}
 
-	sshConfig.Auth, err = d.generateAuth()
+	sshConfig.Auth, err = definition.generateAuth()
 	if err != nil {
 		result.Message = fmt.Sprintf("Error when generating ssh auth: %s", err)
-		return result
+		return
 	}
 
 	sshAddress := fmt.Sprintf("%s:%d", definition.Host, definition.Port)
@@ -70,47 +70,58 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 	sshClient, err := ssh.Dial("tcp", sshAddress, sshConfig)
 	if err != nil {
 		result.Message = fmt.Sprintf("Failed to connect to %s: %s", sshAddress, err)
-		return result
+		return
 	}
-	defer sshClient.Close()
+	defer func() {
+		sshClientCloseErr := sshClient.Close()
+		if err == nil && sshClientCloseErr != nil {
+			result.Message = fmt.Sprintf("error closing ssh client connection: %s", sshClientCloseErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	// Create SSH session
 	sshSession, err := sshClient.NewSession()
 	if err != nil {
 		result.Message = fmt.Sprintf("Failed to create ssh session: %s", err)
-		return result
+		return
 	}
-	defer sshSession.Close()
+	defer func() {
+		sshSessionCloseErr := sshSession.Close()
+		if err == nil && sshSessionCloseErr != nil && sshSessionCloseErr.Error() != "EOF" {
+			result.Message = fmt.Sprintf("error closing ssh session connection: %s", sshSessionCloseErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	if definition.Command == "" {
 		result.Passed = true
-		return result
+		return
 	}
 
 	output, err := sshSession.CombinedOutput(definition.Command)
 	if err != nil {
 		result.Message = fmt.Sprintf("Error executing command: %s", err)
-		return result
+		return
 	}
 
 	if definition.MatchContent {
 		// Match some content
-		regex, err := regexp.Compile(d.ContentRegex)
+		regex, err := regexp.Compile(definition.ContentRegex)
 		if err != nil {
 			result.Message = fmt.Sprintf("Error compiling regex string: %s", err)
-			return result
+			return
 		}
 
 		// Check if the content matches
 		if !regex.Match(output) {
 			result.Message = "Matching content not found"
-			return result
+			return
 		}
 	}
 
 	result.Passed = true
-
-	return result
+	return
 }
 
 func (d Definition) generateAuth() (sshAuth []ssh.AuthMethod, err error) {

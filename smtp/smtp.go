@@ -82,7 +82,13 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	} else {
 		client = gosmtp.NewClient(conn)
 	}
-	defer client.Close()
+	defer func() {
+		clientCloseErr := client.Close()
+		if err == nil && clientCloseErr != nil {
+			result.Message = fmt.Sprintf("error closing smtp connection: %s", clientCloseErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	err = client.Noop()
 	if err != nil {

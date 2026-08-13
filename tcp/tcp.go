@@ -53,7 +53,13 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("Failed to connect: %s", err)
 		return
 	}
-	defer conn.Close()
+	defer func() {
+		connCloseErr := conn.Close()
+		if err == nil && connCloseErr != nil {
+			result.Message = fmt.Sprintf("error closing tcp connection: %s", connCloseErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	if definition.Write != "" {
 		_, err := conn.Write([]byte(definition.Write))

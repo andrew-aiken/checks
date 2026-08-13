@@ -251,10 +251,15 @@ func TestSSHRun(t *testing.T) {
 	}
 
 	go func() {
-		sshServer.Serve(listener)
+		err = sshServer.Serve(listener)
+		if err != nil && err.Error() != "ssh: Server closed" {
+			fmt.Printf("Error serving ssh server: %s\n", err.Error())
+		}
 	}()
 	t.Cleanup(func() {
-		sshServer.Close()
+		if err = sshServer.Close(); err != nil {
+			fmt.Printf("Error stopping ssh server: %s\n", err.Error())
+		}
 	})
 
 	for _, tt := range tests {
@@ -408,10 +413,15 @@ func TestSSHKey(t *testing.T) {
 	}
 
 	go func() {
-		sshServer.Serve(listener)
+		err = sshServer.Serve(listener)
+		if err != nil && err.Error() != "ssh: Server closed" {
+			fmt.Printf("Error serving ssh server: %s\n", err.Error())
+		}
 	}()
 	t.Cleanup(func() {
-		sshServer.Close()
+		if err = sshServer.Close(); err != nil {
+			fmt.Printf("Error stopping ssh server: %s\n", err.Error())
+		}
 	})
 
 	for _, tt := range tests {

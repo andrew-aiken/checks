@@ -76,7 +76,13 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("Failed to setup database connection: %s", err)
 		return
 	}
-	defer db.Close(ctx)
+	defer func(ctx context.Context) {
+		dbCloseErr := db.Close(ctx)
+		if err == nil && dbCloseErr != nil {
+			result.Message = fmt.Sprintf("error closing database connection: %s", dbCloseErr.Error())
+			result.Passed = false
+		}
+	}(ctx)
 
 	// If no query is defined pass the check
 	if definition.Query == "" {

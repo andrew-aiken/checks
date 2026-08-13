@@ -89,7 +89,10 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 	return result
 }
 
-func (d Definition) request(ctx context.Context, client *http.Client) (success bool, err error) {
+func (d Definition) request(ctx context.Context, client *http.Client) (success bool, requestError error) {
+	success = false
+	requestError = nil
+
 	// Construct URL
 	var schema string
 	if d.HTTPS {
@@ -106,7 +109,8 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 	// Construct request
 	req, err := http.NewRequestWithContext(ctx, d.Method, url, strings.NewReader(d.Body))
 	if err != nil {
-		return false, fmt.Errorf("error constructing request: %w", err)
+		requestError = fmt.Errorf("error constructing request: %w", err)
+		return
 	}
 
 	// Handle Host header specially if present
@@ -123,13 +127,21 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 	// Send request
 	resp, err := client.Do(req)
 	if err != nil {
-		return false, fmt.Errorf("error making request: %w", err)
+		requestError = fmt.Errorf("error making request: %w", err)
+		return
 	}
-	defer resp.Body.Close()
+	defer func() {
+		respBodyCloseErr := resp.Body.Close()
+		if err == nil && respBodyCloseErr != nil {
+			requestError = fmt.Errorf("error closing client response body: %s", respBodyCloseErr.Error())
+			success = false
+		}
+	}()
 
 	// Check status code
 	if d.MatchCode && resp.StatusCode != int(d.Code) {
-		return false, fmt.Errorf("received bad status code: %d", resp.StatusCode)
+		requestError = fmt.Errorf("received bad status code: %d", resp.StatusCode)
+		return
 	}
 
 	// Check body content
@@ -137,21 +149,24 @@ func (d Definition) request(ctx context.Context, client *http.Client) (success b
 		// Read response body
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return false, fmt.Errorf("received error when reading response body: %w", err)
+			requestError = fmt.Errorf("received error when reading response body: %w", err)
+			return
 		}
 
 		// Check if body matches regex
 		regex, err := regexp.Compile(d.ContentRegex)
 		if err != nil {
-			return false, fmt.Errorf("error compiling regex string: %w", err)
+			requestError = fmt.Errorf("error compiling regex string: %w", err)
+			return
 		}
 		if !regex.Match(body) {
-			return false, fmt.Errorf("received bad response body")
+			requestError = fmt.Errorf("received bad response body")
+			return
 		}
 	}
 
-	// If we've reached this point, then the check succeeded
-	return true, nil
+	success = true
+	return
 }
 
 // Validats the http definition is valid

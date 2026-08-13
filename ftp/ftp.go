@@ -78,7 +78,14 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("Connection to %s on port %d failed: '%s'", definition.Host, definition.Port, err)
 		return
 	}
-	defer conn.Quit()
+	defer func() {
+		connQuitErr := conn.Quit()
+		// Only fail check if the connection has a new error on closing the connection
+		if err == nil && connQuitErr != nil {
+			result.Message = fmt.Sprintf("error closing ftp connection: %s", connQuitErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	err = conn.Login(definition.Username, definition.Password)
 	if err != nil {
@@ -98,7 +105,14 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("Could not retrieve file %s : %s", definition.File, err)
 		return
 	}
-	defer resp.Close()
+	defer func() {
+		respCloseErr := resp.Close()
+		// Only fail check if the connection has a new error on closing the connection
+		if err == nil && respCloseErr != nil {
+			result.Message = fmt.Sprintf("error closing ftp data connection: %s", respCloseErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	content, err := io.ReadAll(resp)
 	if err != nil {

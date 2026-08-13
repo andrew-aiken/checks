@@ -59,7 +59,13 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("Failed to dial ldap %s: %s", address, err)
 		return
 	}
-	defer conn.Close()
+	defer func() {
+		connCloseErr := conn.Close()
+		if err == nil && connCloseErr != nil {
+			result.Message = fmt.Sprintf("error closing ldap connection: %s", connCloseErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	conn.SetTimeout(time.Duration(definition.Timeout) * time.Second)
 

@@ -42,7 +42,7 @@ func (k *kerberosTransport) Transport(endpoint *winrmClient.Endpoint) error {
 	return nil
 }
 
-func (k *kerberosTransport) Post(_ *winrmClient.Client, request *soap.SoapMessage) (string, error) {
+func (k *kerberosTransport) Post(_ *winrmClient.Client, request *soap.SoapMessage) (response string, postErr error) {
 	cfg := krbconfig.New()
 	cfg.LibDefaults.DefaultRealm = k.Realm
 	cfg.Realms = []krbconfig.Realm{
@@ -56,32 +56,43 @@ func (k *kerberosTransport) Post(_ *winrmClient.Client, request *soap.SoapMessag
 		client.DisablePAFXFAST(true), client.AssumePreAuthentication(true))
 
 	winrmURL := fmt.Sprintf("%s://%s:%d/wsman", k.Proto, k.Hostname, k.Port)
-	//nolint:noctx
+
 	winRMRequest, err := http.NewRequest("POST", winrmURL, strings.NewReader(request.String()))
 	if err != nil {
-		return "", fmt.Errorf("unable to create request: %w", err)
+		postErr = fmt.Errorf("unable to create request: %w", err)
+		return
 	}
 	winRMRequest.Header.Add("Content-Type", "application/soap+xml;charset=UTF-8")
 
 	if err := spnego.SetSPNEGOHeader(kerberosClient, winRMRequest, k.SPN); err != nil {
-		return "", fmt.Errorf("unable to set SPNego Header: %w", err)
+		postErr = fmt.Errorf("unable to set SPNego Header: %w", err)
+		return
 	}
 
 	httpClient := &http.Client{Transport: k.transport}
 	resp, err := httpClient.Do(winRMRequest)
 	if err != nil {
-		return "", err
+		postErr = err
+		return
 	}
-	defer resp.Body.Close()
+	defer func() {
+		bodyCloseErr := resp.Body.Close()
+		if err == nil && bodyCloseErr != nil {
+			err = fmt.Errorf("error closing response body: %s", bodyCloseErr.Error())
+		}
+	}()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		postErr = err
+		return
 	}
 
 	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("request returned: %d - %s. Response body:\n%s", resp.StatusCode, resp.Status, string(body))
+		postErr = fmt.Errorf("request returned: %d - %s. Response body:\n%s", resp.StatusCode, resp.Status, string(body))
+		return
 	}
 
-	return string(body), nil
+	response = string(body)
+	return
 }

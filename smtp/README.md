@@ -14,7 +14,7 @@ docker run -d --rm \
 
 sleep 3
 
-CI_SMTP=true go test ./... -v
+CI_SMTP=true go test ./... -v --cover
 
 docker rm -f mailpit
 ```

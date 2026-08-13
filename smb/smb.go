@@ -84,7 +84,13 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("Failed to tree connect: %s", err)
 		return
 	}
-	defer session.TreeDisconnect(definition.Share)
+	defer func() {
+		treeDisconnectErr := session.TreeDisconnect(definition.Share)
+		if err == nil && treeDisconnectErr != nil {
+			result.Message = fmt.Sprintf("error closing smb tree connection: %s", treeDisconnectErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	if definition.File != "" {
 		var buf bytes.Buffer

@@ -103,7 +103,13 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 			result.Message = fmt.Sprintf("Failed to open file: %s", err)
 			return
 		}
-		defer file.Close()
+		defer func() {
+			fileCloseErr := file.Close()
+			if err == nil && fileCloseErr != nil {
+				result.Message = fmt.Sprintf("error closing file: %s", fileCloseErr.Error())
+				result.Passed = false
+			}
+		}()
 
 		content, err := io.ReadAll(file)
 		if err != nil {

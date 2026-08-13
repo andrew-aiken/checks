@@ -73,7 +73,13 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("Failed to create database handle: %s", err)
 		return
 	}
-	defer db.Close()
+	defer func() {
+		dbCloseErr := db.Close()
+		if err == nil && dbCloseErr != nil {
+			result.Message = fmt.Sprintf("error closing database connection: %s", dbCloseErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	db.SetMaxOpenConns(1)
 	db.SetConnMaxLifetime(time.Duration(definition.Timeout) * time.Second)
@@ -97,7 +103,13 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("Failed to query database: %s", err)
 		return
 	}
-	defer rows.Close()
+	defer func() {
+		rowCloseErr := rows.Close()
+		if err == nil && rowCloseErr != nil {
+			result.Message = fmt.Sprintf("error closing database connection: %s", rowCloseErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	if definition.MatchContent {
 		regex, err := regexp.Compile(definition.ContentRegex)

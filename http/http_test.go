@@ -151,7 +151,7 @@ func TestHTTPRun(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring: `Error making request: Get "https://dne.neccdl.org:443/": dial tcp: lookup dne.neccdl.org`,
+			MessageSubstring: `error making request: Get "https://dne.neccdl.org:443/": dial tcp: lookup dne.neccdl.org`,
 		},
 		{
 			Name: "InvalidHost",
@@ -166,7 +166,7 @@ func TestHTTPRun(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring: `Error constructing request: parse "https://^&@/neccdl.org:443/": net/url: invalid userinfo`,
+			MessageSubstring: `error constructing request: parse "https://^&@/neccdl.org:443/": net/url: invalid userinfo`,
 		},
 		{
 			Name: "MatchStatusCode",
@@ -182,7 +182,7 @@ func TestHTTPRun(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring: "Received bad status code: 200",
+			MessageSubstring: "received bad status code: 200",
 		},
 		{
 			Name: "MatchResponseSuccess",
@@ -215,7 +215,7 @@ func TestHTTPRun(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring: "Received bad response body",
+			MessageSubstring: "received bad response body",
 		},
 		{
 			Name: "InvalidRegex",
@@ -232,7 +232,7 @@ func TestHTTPRun(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring: "Error compiling regex string",
+			MessageSubstring: "error compiling regex string",
 		},
 	}
 

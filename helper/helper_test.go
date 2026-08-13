@@ -13,6 +13,7 @@ import (
 	"github.com/andrew-aiken/checks/mysql"
 	"github.com/andrew-aiken/checks/noop"
 	"github.com/andrew-aiken/checks/postgresql"
+	"github.com/andrew-aiken/checks/rdp"
 	"github.com/andrew-aiken/checks/smb"
 	"github.com/andrew-aiken/checks/smtp"
 	"github.com/andrew-aiken/checks/ssh"
@@ -36,6 +37,7 @@ func TestNewDefinition(t *testing.T) {
 		{"mysql", &mysql.Definition{}, false},
 		{"noop", &noop.Definition{}, false},
 		{"postgresql", &postgresql.Definition{}, false},
+		{"rdp", &rdp.Definition{}, false},
 		{"smb", &smb.Definition{}, false},
 		{"smtp", &smtp.Definition{}, false},
 		{"ssh", &ssh.Definition{}, false},

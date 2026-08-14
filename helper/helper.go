@@ -10,6 +10,7 @@ import (
 	"github.com/andrew-aiken/checks/ldap"
 	"github.com/andrew-aiken/checks/mysql"
 	"github.com/andrew-aiken/checks/noop"
+	"github.com/andrew-aiken/checks/pop3"
 	"github.com/andrew-aiken/checks/postgresql"
 	"github.com/andrew-aiken/checks/rdp"
 	"github.com/andrew-aiken/checks/smb"
@@ -37,6 +38,8 @@ func NewDefinition(checkType string) (definitionType any, err error) {
 		return &mysql.Definition{}, nil
 	case "noop":
 		return &noop.Definition{}, nil
+	case "pop3":
+		return &pop3.Definition{}, nil
 	case "postgresql":
 		return &postgresql.Definition{}, nil
 	case "rdp":

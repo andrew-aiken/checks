@@ -171,5 +171,17 @@ func (d Definition) Validate() (passed bool, message string) {
 		return false, "Mail id must be set to use match or delete functionality"
 	}
 
+	if d.MatchSubject && d.SubjectRegex != "" {
+		if _, err := regexp.Compile(d.SubjectRegex); err != nil {
+			return false, "Failed to compile subject regex"
+		}
+	}
+
+	if d.MatchBody && d.BodyRegex != "" {
+		if _, err := regexp.Compile(d.BodyRegex); err != nil {
+			return false, "Failed to compile body regex"
+		}
+	}
+
 	return true, ""
 }

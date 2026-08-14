@@ -314,6 +314,30 @@ func TestPOP3Validate(t *testing.T) {
 			},
 			ValidateMessage: "Mail id must be set to use match or delete functionality",
 		},
+		{
+			Name: "InvalidSubjectRegex",
+			Definition: pop3.Definition{
+				Host:         "mail.neccdl.org",
+				Username:     "user",
+				Password:     "dummy",
+				MailID:       1,
+				MatchSubject: true,
+				SubjectRegex: "[a-z",
+			},
+			ValidateMessage: "Failed to compile subject regex",
+		},
+		{
+			Name: "InvalidBodyRegex",
+			Definition: pop3.Definition{
+				Host:      "mail.neccdl.org",
+				Username:  "user",
+				Password:  "dummy",
+				MailID:    1,
+				MatchBody: true,
+				BodyRegex: "[a-z",
+			},
+			ValidateMessage: "Failed to compile body regex",
+		},
 	}
 
 	for _, tt := range tests {

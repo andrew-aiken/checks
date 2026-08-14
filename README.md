@@ -35,7 +35,7 @@ This project provides unified checks that can be consumed across a wide variety 
 | [SMTP](smtp/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [SSH](ssh/)               |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [TCP](tcp/)               |                       ✅                        |                           ⭕                           |                      ✅                       |   ✅   |
-| VNC                       |                       ✅                        |                           ✅                           |                      ⭕                       |   ⭕   |
+| [VNC](vnc/)               |                       ✅                        |                           ✅                           |                      ⭕                       |   ✅   |
 | [WINRM](winrm/)           |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | XMPP                      |                       ⭕                        |                           ✅                           |                      ⭕                       |   ⭕   |
 

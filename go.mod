@@ -17,6 +17,7 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.4
 	github.com/jfjallid/go-smb v0.11.0
 	github.com/jlaffaye/ftp v0.2.2
+	github.com/kward/go-vnc v0.0.0-20260515191714-83d72ad87d5f
 	github.com/masterzen/winrm v0.0.0-20260407182533-5570be7f80cf
 	github.com/miekg/dns v1.1.72
 	github.com/nakagami/grdp v0.9.6

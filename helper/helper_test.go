@@ -18,6 +18,7 @@ import (
 	"github.com/andrew-aiken/checks/smtp"
 	"github.com/andrew-aiken/checks/ssh"
 	"github.com/andrew-aiken/checks/tcp"
+	"github.com/andrew-aiken/checks/vnc"
 	"github.com/andrew-aiken/checks/winrm"
 )
 
@@ -42,6 +43,7 @@ func TestNewDefinition(t *testing.T) {
 		{"smtp", &smtp.Definition{}, false},
 		{"ssh", &ssh.Definition{}, false},
 		{"tcp", &tcp.Definition{}, false},
+		{"vnc", &vnc.Definition{}, false},
 		{"winrm", &winrm.Definition{}, false},
 		{"unknown", nil, true},
 		{"", nil, true},

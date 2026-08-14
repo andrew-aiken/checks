@@ -16,6 +16,7 @@ import (
 	"github.com/andrew-aiken/checks/smtp"
 	"github.com/andrew-aiken/checks/ssh"
 	"github.com/andrew-aiken/checks/tcp"
+	"github.com/andrew-aiken/checks/vnc"
 	"github.com/andrew-aiken/checks/winrm"
 )
 
@@ -48,6 +49,8 @@ func NewDefinition(checkType string) (definitionType any, err error) {
 		return &ssh.Definition{}, nil
 	case "tcp":
 		return &tcp.Definition{}, nil
+	case "vnc":
+		return &vnc.Definition{}, nil
 	case "winrm":
 		return &winrm.Definition{}, nil
 	default:

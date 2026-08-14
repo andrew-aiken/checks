@@ -189,3 +189,64 @@ func TestSMB(t *testing.T) {
 		})
 	}
 }
+
+func TestSMBValidate(t *testing.T) {
+	tests := []struct {
+		Name            string
+		Definition      smb.Definition
+		ValidateMessage string
+	}{
+		{
+			Name: "Valid",
+			Definition: smb.Definition{
+				Host:         "smb.neccdl.org",
+				Username:     "user",
+				Password:     "dummy",
+				Share:        "Files",
+				MatchContent: true,
+				ContentRegex: ".*",
+			},
+		},
+		{
+			Name: "MissingHost",
+			Definition: smb.Definition{
+				// Host:         "smb.neccdl.org",
+				Username: "user",
+				Password: "dummy",
+				Share:    "Files",
+			},
+			ValidateMessage: "Host needs to be defined",
+		},
+		{
+			Name: "MissingShare",
+			Definition: smb.Definition{
+				Host:     "smb.neccdl.org",
+				Username: "user",
+				Password: "dummy",
+				// Share:        "Files",
+			},
+			ValidateMessage: "Share needs to be defined",
+		},
+		{
+			Name: "InvalidRegex",
+			Definition: smb.Definition{
+				Host:         "smb.neccdl.org",
+				Username:     "user",
+				Password:     "dummy",
+				Share:        "Files",
+				MatchContent: true,
+				ContentRegex: "[a-z",
+			},
+			ValidateMessage: "Failed to compile regex",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			_, message := tt.Definition.Validate()
+			if message != tt.ValidateMessage {
+				t.Fatalf("Validate message does not match expected message(%q): got %q want %q", tt.Name, message, tt.ValidateMessage)
+			}
+		})
+	}
+}

@@ -17,6 +17,7 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.4
 	github.com/jfjallid/go-smb v0.11.0
 	github.com/jlaffaye/ftp v0.2.2
+	github.com/knadh/go-pop3 v1.0.2
 	github.com/kward/go-vnc v0.0.0-20260515191714-83d72ad87d5f
 	github.com/masterzen/winrm v0.0.0-20260407182533-5570be7f80cf
 	github.com/miekg/dns v1.1.72
@@ -38,6 +39,7 @@ require (
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
+	github.com/emersion/go-message v0.18.2 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.8 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect

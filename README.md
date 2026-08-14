@@ -28,7 +28,7 @@ This project provides unified checks that can be consumed across a wide variety 
 | [LDAP](ldap/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | MSSQL                     |                       ⭕                        |                           ✅                           |                      ⭕                       |   ⭕   |
 | [MySQL](mysql/)           |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
-| POP3                      |                       ✅                        |                           ⭕                           |                      ⭕                       |   ⭕   |
+| [POP3](pop3/)             |                       ✅                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [PostgreSQL](postgresql/) |                       ⭕                        |                           ✅                           |                      ⭕                       |   ✅   |
 | [RDP](rdp/)               |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [SMB](smb/)               |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |

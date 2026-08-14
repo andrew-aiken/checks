@@ -135,3 +135,22 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	result.Passed = true
 	return
 }
+
+// Validate checks if the smb definition is valid
+func (d Definition) Validate() (passed bool, message string) {
+	if d.Host == "" {
+		return false, "Host needs to be defined"
+	}
+
+	if d.Share == "" {
+		return false, "Share needs to be defined"
+	}
+
+	if d.MatchContent && d.ContentRegex != "" {
+		if _, err := regexp.Compile(d.ContentRegex); err != nil {
+			return false, "Failed to compile regex"
+		}
+	}
+
+	return true, ""
+}

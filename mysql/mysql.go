@@ -69,7 +69,6 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	connectionDSN := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s%s", definition.Username, definition.Password, definition.Host, definition.Port, definition.Database, databaseParameters)
 	db, err := sql.Open("mysql", connectionDSN)
 	if err != nil {
-		// TODO: not sure how to test this
 		result.Message = fmt.Sprintf("Failed to create database handle: %s", err)
 		return
 	}

@@ -46,7 +46,7 @@ type Definition struct {
 	File string `json:"file"`
 	// Whether the file must match a defined regex for the check to pass
 	MatchContent bool `json:"matchContent" default:"false"`
-	// Regex to match against the returned file  --- TODO file or content
+	// Regex to match against the content of the returned file
 	ContentRegex string `json:"contentRegex" default:".*"`
 	// Whether or not to compare the head commit hash
 	MatchHeadHash bool `json:"matchHeadHash" default:"false"`

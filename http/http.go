@@ -90,7 +90,6 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		Timeout:       time.Duration(definition.Timeout) * time.Second,
 	}
 
-	// TODO: create child context with deadline less than the parent context
 	pass, err := definition.request(ctx, client)
 
 	// Process request results

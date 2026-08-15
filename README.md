@@ -24,7 +24,7 @@ This project provides unified checks that can be consumed across a wide variety 
 | [GIT](git/)               |                       ⭕                        |                           ✅                           |                      ⭕                       |   ✅   |
 | [HTTP](http/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [ICMP](icmp/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
-| IMAP                      |                       ✅                        |                           ⭕                           |                      ✅                       |   ⭕   |
+| [IMAP](imap/)             |                       ✅                        |                           ⭕                           |                      ✅                       |   ✅   |
 | [LDAP](ldap/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | MSSQL                     |                       ⭕                        |                           ✅                           |                      ⭕                       |   ⭕   |
 | [MySQL](mysql/)           |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |

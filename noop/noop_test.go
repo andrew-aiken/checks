@@ -58,7 +58,7 @@ func TestNoop(t *testing.T) {
 			result = tt.Definition.Run(ctx, staticConf)
 
 			if result.Passed != tt.Result.Passed {
-				t.Fatalf("Check result does not match expected result(%q) message %t", tt.Name, result.Passed)
+				t.Fatalf("Check does not match expected result: test(%q) got %t", tt.Name, result.Passed)
 			}
 		})
 	}

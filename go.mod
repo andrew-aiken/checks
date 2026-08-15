@@ -2,8 +2,6 @@ module github.com/andrew-aiken/checks
 
 go 1.26.5
 
-replace github.com/nakagami/grdp => github.com/andrew-aiken/grdp v0.0.0-20260813144707-1e14be631b37
-
 require (
 	github.com/emersion/go-imap/v2 v2.0.0-beta.8
 	github.com/emersion/go-message v0.18.2
@@ -23,7 +21,7 @@ require (
 	github.com/kward/go-vnc v0.0.0-20260515191714-83d72ad87d5f
 	github.com/masterzen/winrm v0.0.0-20260407182533-5570be7f80cf
 	github.com/miekg/dns v1.1.72
-	github.com/nakagami/grdp v0.9.6
+	github.com/nakagami/grdp v0.9.7
 	github.com/prometheus-community/pro-bing v0.9.1
 	github.com/spf13/afero v1.15.0
 	golang.org/x/crypto v0.54.0

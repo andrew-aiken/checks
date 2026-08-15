@@ -216,7 +216,7 @@ func TestPOP3(t *testing.T) {
 			result := tt.Definition.Run(timeoutContext, staticConfig)
 
 			if result.Passed != tt.Result.Passed {
-				t.Fatalf("Check result does not match expected result(%q) message %t", tt.Name, result.Passed)
+				t.Fatalf("Check does not match expected result: test(%q) got %t", tt.Name, result.Passed)
 			}
 
 			if tt.MessageSubstring != "" && !strings.Contains(result.Message, tt.MessageSubstring) {
@@ -304,7 +304,7 @@ func TestPOP3Validate(t *testing.T) {
 			ValidateMessage: "Username needs to be defined",
 		},
 		{
-			Name: "MissingUsername",
+			Name: "MissingMailID",
 			Definition: pop3.Definition{
 				Host:       "mail.neccdl.org",
 				Username:   "user",

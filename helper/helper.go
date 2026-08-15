@@ -7,6 +7,7 @@ import (
 	"github.com/andrew-aiken/checks/ftp"
 	"github.com/andrew-aiken/checks/http"
 	"github.com/andrew-aiken/checks/icmp"
+	"github.com/andrew-aiken/checks/imap"
 	"github.com/andrew-aiken/checks/ldap"
 	"github.com/andrew-aiken/checks/mysql"
 	"github.com/andrew-aiken/checks/noop"
@@ -32,6 +33,8 @@ func NewDefinition(checkType string) (definitionType any, err error) {
 		return &http.Definition{}, nil
 	case "icmp":
 		return &icmp.Definition{}, nil
+	case "imap":
+		return &imap.Definition{}, nil
 	case "ldap":
 		return &ldap.Definition{}, nil
 	case "mysql":

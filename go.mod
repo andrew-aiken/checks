@@ -5,6 +5,8 @@ go 1.26.5
 replace github.com/nakagami/grdp => github.com/andrew-aiken/grdp v0.0.0-20260813144707-1e14be631b37
 
 require (
+	github.com/emersion/go-imap/v2 v2.0.0-beta.8
+	github.com/emersion/go-message v0.18.2
 	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6
 	github.com/emersion/go-smtp v0.24.0
 	github.com/fclairamb/ftpserverlib v0.32.1
@@ -39,7 +41,6 @@ require (
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
-	github.com/emersion/go-message v0.18.2 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.8 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect

@@ -156,7 +156,7 @@ func TestTCPCheck(t *testing.T) {
 			result := tt.Definition.Run(timeoutContext, staticConfig)
 
 			if result.Passed != tt.Result.Passed {
-				t.Fatalf("Check result does not match expected result(%q) message %t", tt.Name, result.Passed)
+				t.Fatalf("Check does not match expected result: test(%q) got %t", tt.Name, result.Passed)
 			}
 
 			if tt.MessageSubstring != "" && !strings.Contains(result.Message, tt.MessageSubstring) {
@@ -204,7 +204,7 @@ func TestTCPCheckWrite(t *testing.T) {
 			result := tt.Definition.Run(timeoutContext, staticConfig)
 
 			if result.Passed != tt.Result.Passed {
-				t.Fatalf("Check result does not match expected result(%q) message %t", tt.Name, result.Passed)
+				t.Fatalf("Check does not match expected result: test(%q) got %t", tt.Name, result.Passed)
 			}
 
 			if tt.MessageSubstring != "" && !strings.Contains(result.Message, tt.MessageSubstring) {

@@ -76,7 +76,13 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("Failed to connect: %s\n", err.Error())
 		return
 	}
-	defer c.Quit()
+	defer func() {
+		connQuitErr := c.Quit()
+		if err == nil && connQuitErr != nil {
+			result.Message = fmt.Sprintf("Failed to close connection: %s", connQuitErr.Error())
+			result.Passed = false
+		}
+	}()
 
 	// Authenticate.
 	if err := c.Auth(definition.Username, definition.Password); err != nil {

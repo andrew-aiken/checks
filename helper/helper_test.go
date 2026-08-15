@@ -9,6 +9,7 @@ import (
 	"github.com/andrew-aiken/checks/helper"
 	"github.com/andrew-aiken/checks/http"
 	"github.com/andrew-aiken/checks/icmp"
+	"github.com/andrew-aiken/checks/imap"
 	"github.com/andrew-aiken/checks/ldap"
 	"github.com/andrew-aiken/checks/mysql"
 	"github.com/andrew-aiken/checks/noop"
@@ -35,6 +36,7 @@ func TestNewDefinition(t *testing.T) {
 		{"ftp", &ftp.Definition{}, false},
 		{"http", &http.Definition{}, false},
 		{"icmp", &icmp.Definition{}, false},
+		{"imap", &imap.Definition{}, false},
 		{"ldap", &ldap.Definition{}, false},
 		{"mysql", &mysql.Definition{}, false},
 		{"noop", &noop.Definition{}, false},

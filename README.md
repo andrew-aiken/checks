@@ -25,6 +25,7 @@ This project provides unified checks that can be consumed across a wide variety 
 | [HTTP](http/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [ICMP](icmp/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [IMAP](imap/)             |                       ✅                        |                           ⭕                           |                      ✅                       |   ✅   |
+| [Kubernetes](kubernetes/) |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [LDAP](ldap/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | MSSQL                     |                       ⭕                        |                           ✅                           |                      ⭕                       |   ⭕   |
 | [MySQL](mysql/)           |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |

@@ -17,6 +17,7 @@ import (
 	"github.com/andrew-aiken/checks/rdp"
 	"github.com/andrew-aiken/checks/smb"
 	"github.com/andrew-aiken/checks/smtp"
+	"github.com/andrew-aiken/checks/snmp"
 	"github.com/andrew-aiken/checks/ssh"
 	"github.com/andrew-aiken/checks/tcp"
 	"github.com/andrew-aiken/checks/vnc"
@@ -54,6 +55,8 @@ func NewDefinition(checkType string) (definitionType any, err error) {
 		return &smb.Definition{}, nil
 	case "smtp":
 		return &smtp.Definition{}, nil
+	case "snmp":
+		return &snmp.Definition{}, nil
 	case "ssh":
 		return &ssh.Definition{}, nil
 	case "tcp":

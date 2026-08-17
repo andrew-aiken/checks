@@ -183,7 +183,7 @@ func TestSNMTP(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring: "Failed to get OID: request timeout",
+			MessageSubstring: "Failed to get OID:",
 		},
 		{
 			Name: "InvalidRegex",

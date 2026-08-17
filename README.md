@@ -34,6 +34,7 @@ This project provides unified checks that can be consumed across a wide variety 
 | [RDP](rdp/)               |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [SMB](smb/)               |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [SMTP](smtp/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
+| [SNMP](snmp/)             |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [SSH](ssh/)               |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [TCP](tcp/)               |                       ✅                        |                           ⭕                           |                      ✅                       |   ✅   |
 | [VNC](vnc/)               |                       ✅                        |                           ✅                           |                      ⭕                       |   ✅   |

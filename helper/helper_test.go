@@ -19,6 +19,7 @@ import (
 	"github.com/andrew-aiken/checks/rdp"
 	"github.com/andrew-aiken/checks/smb"
 	"github.com/andrew-aiken/checks/smtp"
+	"github.com/andrew-aiken/checks/snmp"
 	"github.com/andrew-aiken/checks/ssh"
 	"github.com/andrew-aiken/checks/tcp"
 	"github.com/andrew-aiken/checks/vnc"
@@ -47,6 +48,7 @@ func TestNewDefinition(t *testing.T) {
 		{"rdp", &rdp.Definition{}, false},
 		{"smb", &smb.Definition{}, false},
 		{"smtp", &smtp.Definition{}, false},
+		{"snmp", &snmp.Definition{}, false},
 		{"ssh", &ssh.Definition{}, false},
 		{"tcp", &tcp.Definition{}, false},
 		{"vnc", &vnc.Definition{}, false},

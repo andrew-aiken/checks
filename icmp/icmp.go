@@ -25,14 +25,13 @@ type Definition struct {
 	checks.SharedDefinition
 }
 
-func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Results {
-	// Initialize empty result
-	result := checks.Results{Timestamp: time.Now()}
+func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result checks.Results) {
+	result = checks.Results{Timestamp: time.Now()}
 
 	definitionBytes, err := checks.TemplateDefinition(d, static)
 	if err != nil {
 		result.Message = fmt.Sprintf("internal error templating definition: %s", err)
-		return result
+		return
 	}
 
 	var definition Definition
@@ -46,7 +45,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 	pinger, err := probing.NewPinger(definition.Host)
 	if err != nil {
 		result.Message = fmt.Sprintf("Error creating pinger: %s", err)
-		return result
+		return
 	}
 
 	// Send ping
@@ -63,12 +62,12 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 			result.Message = "Not all pings made it back!"
 			details["packetloss_percent"] = strconv.FormatFloat(stats.PacketLoss, 'f', -1, 64)
 			result.Details = details
-			return result
+			return
 		}
 
 		// If we make it here the check passes by percentage
 		result.Passed = true
-		return result
+		return
 	}
 
 	// Check for failure of ICMP
@@ -77,13 +76,12 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) checks.Re
 		details["packets_received"] = fmt.Sprintf("%d", stats.PacketsRecv)
 		details["packets_expected"] = fmt.Sprintf("%d", definition.Count)
 		result.Details = details
-		return result
+		return
 	}
 
 	// If we make it here the check passes
 	result.Passed = true
-
-	return result
+	return
 }
 
 // Validats the icmp definition is valid

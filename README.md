@@ -2,18 +2,18 @@
 
 ![License](https://img.shields.io/badge/License-GLP%203.0-blue.svg)
 ![GitHub Release](https://img.shields.io/github/v/release/andrew-aiken/check)
-![Tests](https://img.shields.io/github/actions/workflow/status/andrew-aiken/checks/gotest)
+![Tests](https://img.shields.io/github/actions/workflow/status/andrew-aiken/checks/gotest.yaml)
 
 ---
 
-This project provides unified checks that can be consumed across a wide variety of scoring systems.
+Unified check definitions that can be consumed across a wide variety of scoring systems.
 
 ### Features
 
-- Service Agnostic
-- Leading amount of supported check types
-- Comprehensive check validation & tests
-- Documentation (wip)
+- Service checks are designed to be consumable by any scoring platform
+- All checks have input validation & integration tests
+- Widest variety of supported check types
+- [Documentation](https://github.com/andrew-aiken/checks/wiki)
 
 ## Supported Checks
 

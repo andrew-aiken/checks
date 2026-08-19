@@ -98,7 +98,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		result.Message = fmt.Sprintf("%s", err)
 	}
 
-	return result
+	return
 }
 
 func (d Definition) request(ctx context.Context, client *http.Client) (success bool, requestError error) {

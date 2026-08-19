@@ -1,7 +1,7 @@
 # Checks
 
 ![License](https://img.shields.io/badge/License-GLP%203.0-blue.svg)
-![GitHub Release](https://img.shields.io/github/v/release/andrew-aiken/check)
+![GitHub Release](https://img.shields.io/github/v/release/andrew-aiken/checks)
 ![Tests](https://img.shields.io/github/actions/workflow/status/andrew-aiken/checks/gotest.yaml)
 
 ---

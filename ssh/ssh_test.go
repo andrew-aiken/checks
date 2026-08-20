@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"os"
 	"strings"
 	"testing"
 
@@ -34,7 +33,6 @@ type RunTest struct {
 	Result           checks.Results
 	MessageSubstring string
 	Key              []byte
-	KeyPath          string
 }
 
 var staticConf = checks.StaticConf{
@@ -91,17 +89,6 @@ func TestSSGValidate(t *testing.T) {
 				Command:  "whoami",
 			},
 			ValidateMessage: "No authentication method defined",
-		},
-		{
-			Name: "KeyAndKeyfile",
-			Definition: ssh.Definition{
-				Host:     "server",
-				Username: "user",
-				Command:  "whoami",
-				Key:      "ssh-rsa ...",
-				KeyFile:  "/foo/bar",
-			},
-			ValidateMessage: "Cannot have both Key and KeyFile defined",
 		},
 	}
 
@@ -328,50 +315,6 @@ func TestSSHKey(t *testing.T) {
 			},
 		},
 		{
-			Name: "KeyFile",
-			Definition: ssh.Definition{
-				Host:     serverHostName,
-				Username: username,
-				KeyFile:  "key.pem",
-				Port:     serverPort,
-			},
-			Key:     sshPrivateKey,
-			KeyPath: "key.pem",
-			Result: checks.Results{
-				Passed: true,
-			},
-		},
-		{
-			Name: "KeyFileAndKey", // Validation does not allow this, but test in place to verify it would work
-			Definition: ssh.Definition{
-				Host:     serverHostName,
-				Username: username,
-				Key:      string(sshPrivateKey),
-				KeyFile:  "key.pem",
-				Port:     serverPort,
-			},
-			Key:     sshPrivateKey,
-			KeyPath: "key.pem",
-			Result: checks.Results{
-				Passed: true,
-			},
-		},
-		{
-			Name: "NonExistentKey",
-			Definition: ssh.Definition{
-				Host:     serverHostName,
-				Username: username,
-				KeyFile:  "DNE.pem",
-				Port:     serverPort,
-			},
-			Key:     sshPrivateKey,
-			KeyPath: "key.pem",
-			Result: checks.Results{
-				Passed: false,
-			},
-			MessageSubstring: "Error when generating ssh auth: unable to read private key: open",
-		},
-		{
 			Name: "KeyAndPassword",
 			Definition: ssh.Definition{
 				Host:     serverHostName,
@@ -426,15 +369,6 @@ func TestSSHKey(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
-			if tt.KeyPath != "" {
-				testPath := t.TempDir()
-				keyPath := testPath + "/" + tt.KeyPath
-				if err := os.WriteFile(keyPath, tt.Key, 0600); err != nil {
-					t.Fatal(err)
-				}
-				tt.Definition.KeyFile = testPath + "/" + tt.Definition.KeyFile
-			}
-
 			result := tt.Definition.Run(ctx, staticConf)
 
 			if result.Passed != tt.Result.Passed {

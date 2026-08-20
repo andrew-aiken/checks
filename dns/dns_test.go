@@ -33,7 +33,7 @@ func TestDNSValidate(t *testing.T) {
 			Name: "MissingServer",
 			Definition: dns.Definition{
 				// Server: "",
-				Fqdn:           "example.com",
+				Domain:         "example.com",
 				ExpectedResult: "DNE",
 				Port:           53,
 				RecordType:     "A",
@@ -41,21 +41,21 @@ func TestDNSValidate(t *testing.T) {
 			ValidateMessage: "Server needs to be defined",
 		},
 		{
-			Name: "MissingFqdn",
+			Name: "MissingDomain",
 			Definition: dns.Definition{
 				Server: "1.1.1.1",
-				// Fqdn: "",
+				// Domain: "",
 				ExpectedResult: "DNE",
 				Port:           53,
 				RecordType:     "A",
 			},
-			ValidateMessage: "FQDN needs to be defined",
+			ValidateMessage: "Domain needs to be defined",
 		},
 		{
 			Name: "MissingResult",
 			Definition: dns.Definition{
 				Server: "1.1.1.1",
-				Fqdn:   "example.com",
+				Domain: "example.com",
 				// ExpectedResult: "",
 				Port:       53,
 				RecordType: "A",
@@ -80,7 +80,7 @@ func TestDNSRun(t *testing.T) {
 			Name: "InvalidRecordType",
 			Definition: dns.Definition{
 				Server:         "1.1.1.1",
-				Fqdn:           "example.com",
+				Domain:         "example.com",
 				ExpectedResult: "dummy",
 				RecordType:     "DNE",
 			},
@@ -93,7 +93,7 @@ func TestDNSRun(t *testing.T) {
 			Name: "InvalidRegex",
 			Definition: dns.Definition{
 				Server:         "1.1.1.1",
-				Fqdn:           "example.com",
+				Domain:         "example.com",
 				ExpectedResult: "{{",
 				RecordType:     "DNE",
 			},
@@ -106,7 +106,7 @@ func TestDNSRun(t *testing.T) {
 			Name: "BadQuery",
 			Definition: dns.Definition{
 				Server:         "1.1.1.1.1",
-				Fqdn:           "example.com",
+				Domain:         "example.com",
 				ExpectedResult: "dummy",
 				RecordType:     "A",
 				Port:           53,
@@ -120,7 +120,7 @@ func TestDNSRun(t *testing.T) {
 			Name: "NoResults",
 			Definition: dns.Definition{
 				Server:         "1.1.1.1",
-				Fqdn:           "dne.neccdl.org",
+				Domain:         "dne.neccdl.org",
 				ExpectedResult: "dne",
 				RecordType:     "A",
 				Port:           53,
@@ -134,7 +134,7 @@ func TestDNSRun(t *testing.T) {
 			Name: "WrongResults",
 			Definition: dns.Definition{
 				Server:         "1.1.1.1",
-				Fqdn:           "one.one.one.one",
+				Domain:         "one.one.one.one",
 				ExpectedResult: "dne",
 				RecordType:     "A",
 				Port:           53,
@@ -148,7 +148,7 @@ func TestDNSRun(t *testing.T) {
 			Name: "Validate",
 			Definition: dns.Definition{
 				Server:         "1.1.1.1",
-				Fqdn:           "one.one.one.one",
+				Domain:         "one.one.one.one",
 				ExpectedResult: "1.1.1.1",
 				RecordType:     "A",
 				Port:           53,

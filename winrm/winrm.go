@@ -31,9 +31,9 @@ type Definition struct {
 	Encrypted bool `json:"encrypted" default:"false"`
 	// Allow the connection to go over insecure connections
 	Insecure bool `json:"insecure" default:"false"`
-	// whether the response body must match a defined regex for the check to pass
+	// Whether the response body must match a defined regex for the check to pass
 	MatchContent bool `json:"matchContent"`
-	// regex for the response body to match
+	// Regex for the response body to match
 	ContentRegex string `json:"contentRegex" default:".*"`
 	// Hostname, used when connecting with kerberos
 	Hostname string `json:"hostname"`

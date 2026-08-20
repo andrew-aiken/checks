@@ -19,7 +19,7 @@ import (
 type Definition struct {
 	// IP or hostname of the host to run against
 	Host string `json:"host" optiontype:"required"`
-	// Command to run if successfully connected with SSH
+	// File to retrieve
 	File string `json:"file"`
 	// Name of the SMB share
 	Share string `json:"share" optiontype:"required"`
@@ -33,7 +33,7 @@ type Definition struct {
 	Password string `json:"password"`
 	// Whether to match the files contents againsta regex
 	MatchContent bool `json:"matchContent" default:"false"`
-	// regex to match againsts the files contents
+	// Regex to match againsts the files contents
 	ContentRegex string `json:"contentRegex" default:".*"`
 	// Whether or not to match a hash of the file contents
 	MatchContentHash bool `json:"matchContentHash" default:"false"`

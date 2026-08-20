@@ -127,23 +127,6 @@ func TestICMPRun(t *testing.T) {
 		{
 			Name: "FailurePacketCountMismatch",
 			Definition: icmp.Definition{
-				AllowPacketLoss: true,
-				Count:           1,
-				Host:            "192.0.2.1",
-				Percent:         100,
-			},
-			Result: checks.Results{
-				Passed: false,
-			},
-			MessageSubstring:   "Not all pings made it back!",
-			ExpectedDetailKeys: []string{"packets_received", "packets_expected"},
-			ExpectedDetailExactVals: map[string]string{
-				"packets_expected": "1",
-			},
-		},
-		{
-			Name: "FailurePacketLossThreshold",
-			Definition: icmp.Definition{
 				AllowPacketLoss: false,
 				Count:           1,
 				Host:            "192.0.2.1",
@@ -152,8 +135,25 @@ func TestICMPRun(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring:   "Not all pings made it back!",
-			ExpectedDetailKeys: []string{"packetloss_percent"},
+			MessageSubstring:   "Not all pings made it back",
+			ExpectedDetailKeys: []string{"packets_received", "packets_expected"},
+			ExpectedDetailExactVals: map[string]string{
+				"packets_expected": "1",
+			},
+		},
+		{
+			Name: "FailurePacketLossThreshold",
+			Definition: icmp.Definition{
+				AllowPacketLoss: true,
+				Count:           1,
+				Host:            "192.0.2.1",
+				Percent:         100,
+			},
+			Result: checks.Results{
+				Passed: false,
+			},
+			MessageSubstring:   "Not all pings made it back",
+			ExpectedDetailKeys: []string{"packet_loss_percent"},
 		},
 		{
 			Name: "CloudflareHostCheckPacketLoss",

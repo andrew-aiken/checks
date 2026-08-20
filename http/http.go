@@ -18,29 +18,29 @@ import (
 type Definition struct {
 	// IP or FQDN of the HTTP server
 	Host string `json:"host" optiontype:"required"`
-	// Path to request - see RFC3986, section 3.3
+	// Path to request
 	Path string `json:"path" default:"/"`
-	// if HTTPS is to be used
+	// If HTTPS is to be used
 	HTTPS bool `json:"https" default:"false"`
 	// TCP port number the HTTP server is listening on
 	Port uint16 `json:"port" default:"80"`
 	// HTTP method to use
 	Method string `json:"method" default:"GET"`
-	// the response status code to match
+	// The response status code to match
 	Code uint16 `json:"code" default:"200"`
-	// regex for the response body to match
+	// Regex for the response body to match
 	ContentRegex string `json:"contentRegex" default:".*"`
-	// name-value pairs of header fields to add/override
+	// Name-value pairs of header fields to add/override
 	Headers map[string]string `json:"headers"`
-	// the request body
+	// The request body
 	Body string `json:"body"`
-	// whether the response code must match a defined value for the check to pass
+	// Whether the response code must match a defined value for the check to pass
 	MatchCode bool `json:"matchCode"`
-	// whether the response body must match a defined regex for the check to pass
+	// Whether the response body must match a defined regex for the check to pass
 	MatchContent bool `json:"matchContent"`
-	// whether to follow http redirects
+	// Whether to follow http redirects
 	Redirect bool `json:"redirect"`
-	// whether to verify the server's TLS certificate
+	// Whether to verify the server's TLS certificate
 	VerifyCert bool `json:"verifyCert"`
 	// Shared configuration across all checks
 	checks.SharedDefinition

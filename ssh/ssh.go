@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"regexp"
 	"time"
 
@@ -14,24 +13,22 @@ import (
 )
 
 type Definition struct {
-	// Command to run if successfully connected with SSH
-	Command string `json:"command"`
-	// regex for the response to match
-	ContentRegex string `json:"contentRegex" default:".*"`
 	// IP or hostname of the host to run the SSH check against
 	Host string `json:"host" optiontype:"required"`
-	// SSH private key
-	Key string `json:"key"`
-	// Path to local SSH key
-	KeyFile string `json:"keyFile"`
 	// SSH port
 	Port uint16 `json:"port" default:"22"`
 	// User to SSH with
 	Username string `json:"username" optiontype:"required"`
 	// User password
 	Password string `json:"password"`
+	// SSH private key
+	Key string `json:"key"`
+	// Command to run if successfully connected with SSH
+	Command string `json:"command"`
 	// Whether the response must match a defined regex for the check to pass
 	MatchContent bool `json:"matchContent"`
+	// Regex for the response to match
+	ContentRegex string `json:"contentRegex" default:".*"`
 	// Shared configuration across all checks
 	checks.SharedDefinition
 }
@@ -131,21 +128,9 @@ func (d Definition) generateAuth() (sshAuth []ssh.AuthMethod, err error) {
 		authMethods = append(authMethods, ssh.Password(d.Password))
 	}
 
-	if d.Key != "" || d.KeyFile != "" {
-		var key []byte
-
-		// Read ssh key file
-		if d.KeyFile != "" {
-			key, err = os.ReadFile(d.KeyFile)
-			if err != nil {
-				return authMethods, fmt.Errorf("unable to read private key: %v", err)
-			}
-		} else {
-			key = []byte(d.Key)
-		}
-
+	if d.Key != "" {
 		// Create the Signer for this private key.
-		signer, err := ssh.ParsePrivateKey(key)
+		signer, err := ssh.ParsePrivateKey([]byte(d.Key))
 		if err != nil {
 			return authMethods, fmt.Errorf("unable to parse private key: %v", err)
 		}
@@ -166,11 +151,7 @@ func (d Definition) Validate() (passed bool, message string) {
 		return false, "Username needs to be defined"
 	}
 
-	if d.Key != "" && d.KeyFile != "" {
-		return false, "Cannot have both Key and KeyFile defined"
-	}
-
-	if d.Key == "" && d.KeyFile == "" && d.Password == "" {
+	if d.Key == "" && d.Password == "" {
 		return false, "No authentication method defined"
 	}
 

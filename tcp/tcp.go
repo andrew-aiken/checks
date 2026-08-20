@@ -70,7 +70,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	}
 
 	if definition.MatchContent {
-		data := make([]byte, 1024)
+		data := make([]byte, 2048)
 		length, err := conn.Read(data)
 		if err != nil {
 			result.Message = fmt.Sprintf("Error reading from connection: %s", err)

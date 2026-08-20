@@ -97,6 +97,24 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 		return
 	}
 
+	// Compare the head commit
+	if definition.MatchHeadHash {
+		repoHead, err := repo.Head()
+		if err != nil {
+			result.Message = fmt.Sprintf("Failed to get head of branch: %s", err)
+			return
+		}
+
+		digest := repoHead.Hash()
+
+		// Check if the digest of the file matches the defined hash
+		if digestString := hex.EncodeToString(digest[:]); digestString != definition.HeadHash {
+			result.Message = "Branch head commit does not match"
+			result.Details["hash"] = digestString
+			return
+		}
+	}
+
 	if definition.File != "" {
 		file, err := fs.Open(definition.File)
 		if err != nil {
@@ -140,24 +158,6 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 				result.Details["hash"] = digestString
 				return
 			}
-		}
-	}
-
-	// Compare the head commit
-	if definition.MatchHeadHash {
-		repoHead, err := repo.Head()
-		if err != nil {
-			result.Message = fmt.Sprintf("Failed to get head of branch: %s", err)
-			return
-		}
-
-		digest := repoHead.Hash()
-
-		// Check if the digest of the file matches the defined hash
-		if digestString := hex.EncodeToString(digest[:]); digestString != definition.HeadHash {
-			result.Message = "Branch head commit does not match"
-			result.Details["hash"] = digestString
-			return
 		}
 	}
 

@@ -20,11 +20,11 @@ import (
 type Definition struct {
 	// IP or hostname of the kubernetes apiserver
 	Host string `json:"host" optiontype:"required"`
-	// apiserver port
+	// Kubernetes apiserver port
 	Port uint16 `json:"port" default:"6443"`
-	// username to authenticate with
+	// User to authenticate with
 	Username string `json:"username"`
-	// users password
+	// Users password
 	Password string `json:"password"`
 	// Token for bearer authentication
 	Token string `json:"token"`

@@ -16,9 +16,9 @@ import (
 type Definition struct {
 	// The IP of the DNS server to query
 	Server string `json:"server" optiontype:"required"`
-	// The FQDN of the host you are looking up
-	Fqdn string `json:"fqdn" optiontype:"required"`
-	// The expected IP of the host you are looking up
+	// The FQDN of the host being looking up
+	Domain string `json:"domain" optiontype:"required"`
+	// The expected response data
 	ExpectedResult string `json:"expectedResult" optiontype:"required"`
 	// The port of the DNS server
 	Port uint16 `json:"port" default:"53"`
@@ -53,7 +53,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 
 	// Setup for dns query
 	var msg dns.Msg
-	msg.SetQuestion(dns.Fqdn(definition.Fqdn), recordType)
+	msg.SetQuestion(dns.Fqdn(definition.Domain), recordType)
 
 	// Make it obey timeout via deadline
 	deadctx, cancel := context.WithDeadline(ctx, time.Now().Add(time.Duration(definition.Timeout)*time.Second))
@@ -98,8 +98,8 @@ func (d Definition) Validate() (passed bool, message string) {
 		return false, "Server needs to be defined"
 	}
 
-	if d.Fqdn == "" {
-		return false, "FQDN needs to be defined"
+	if d.Domain == "" {
+		return false, "Domain needs to be defined"
 	}
 
 	if d.ExpectedResult == "" {

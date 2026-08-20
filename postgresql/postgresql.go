@@ -17,7 +17,7 @@ type Definition struct {
 	// IP or FQDN of the database server
 	Host string `json:"host" optiontype:"required"`
 	// TCP port number the postgresql server is listening on
-	Port uint16 `json:"port" default:"3306"`
+	Port uint16 `json:"port" default:"5432"`
 	// User that connects to the postgresql database
 	Username string `json:"username" optiontype:"required"`
 	// The users password

@@ -13,7 +13,7 @@ import (
 )
 
 type Definition struct {
-	// IP or hostname of the host to send the mail to
+	// IP or hostname of the mail server
 	Host string `json:"host" optiontype:"required"`
 	// TCP port number to connect to
 	Port uint16 `json:"port" default:"110"`
@@ -34,11 +34,11 @@ type Definition struct {
 	DeleteMail bool `json:"deleteMail" default:"false"`
 	// Whether to match the mails subject against a regex
 	MatchSubject bool `json:"matchSubject" default:"false"`
-	// regex to match againsts the subject
+	// Regex to match againsts the subject
 	SubjectRegex string `json:"subjectRegex" default:".*"`
 	// Whether to match the mails body against a regex
 	MatchBody bool `json:"matchBody" default:"false"`
-	// regex to match againsts the body
+	// Regex to match againsts the body
 	BodyRegex string `json:"bodyRegex" default:".*"`
 	// Shared configuration across all checks
 	checks.SharedDefinition

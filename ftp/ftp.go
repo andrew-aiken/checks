@@ -19,10 +19,10 @@ import (
 type Definition struct {
 	// IP or FQDN of the FTP server
 	Host string `json:"host" optiontype:"required"`
-	// TCP port number the FTP server is listening on
-	Port uint16 `json:"port" default:"21"`
 	// User that connects to the FTP server
 	Username string `json:"username" optiontype:"required"`
+	// TCP port number the FTP server is listening on
+	Port uint16 `json:"port" default:"21"`
 	// The users password
 	Password string `json:"password"`
 	// Whether to secure the control and data connections with explicit TLS (FTPS, AUTH TLS)

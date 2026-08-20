@@ -14,7 +14,7 @@ import (
 
 type Definition struct {
 	// Pass check based on received pings matching Count; if false, will use percent packet loss
-	AllowPacketLoss bool `json:"allowPacketLoss" default:"true"`
+	AllowPacketLoss bool `json:"allowPacketLoss" default:"false"`
 	// The number of ICMP requests to send per check
 	Count int `json:"count" default:"1"`
 	// IP or hostname of the host to run the ICMP check against
@@ -26,7 +26,10 @@ type Definition struct {
 }
 
 func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result checks.Results) {
-	result = checks.Results{Timestamp: time.Now()}
+	result = checks.Results{
+		Timestamp: time.Now(),
+		Details:   make(map[string]string),
+	}
 
 	definitionBytes, err := checks.TemplateDefinition(d, static)
 	if err != nil {
@@ -55,13 +58,11 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 
 	stats := pinger.Statistics()
 
-	details := make(map[string]string)
 	// Check packet loss instead of count
-	if !definition.AllowPacketLoss {
+	if definition.AllowPacketLoss {
 		if stats.PacketLoss >= float64(definition.Percent) {
-			result.Message = "Not all pings made it back!"
-			details["packetloss_percent"] = strconv.FormatFloat(stats.PacketLoss, 'f', -1, 64)
-			result.Details = details
+			result.Message = "Not all pings made it back"
+			result.Details["packet_loss_percent"] = strconv.FormatFloat(stats.PacketLoss, 'f', -1, 64)
 			return
 		}
 
@@ -72,10 +73,9 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 
 	// Check for failure of ICMP
 	if stats.PacketsRecv != definition.Count {
-		result.Message = "Not all pings made it back!"
-		details["packets_received"] = fmt.Sprintf("%d", stats.PacketsRecv)
-		details["packets_expected"] = fmt.Sprintf("%d", definition.Count)
-		result.Details = details
+		result.Message = "Not all pings made it back"
+		result.Details["packets_received"] = fmt.Sprintf("%d", stats.PacketsRecv)
+		result.Details["packets_expected"] = fmt.Sprintf("%d", definition.Count)
 		return
 	}
 

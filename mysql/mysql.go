@@ -30,9 +30,9 @@ type Definition struct {
 	TLS string `json:"tls" default:"false"`
 	// SQL Query to run
 	Query string `json:"query"`
-	// Whether the file must match a defined regex for the check to pass
+	// Whether the queries results must match a defined regex for the check to pass
 	MatchContent bool `json:"matchContent" default:"false"`
-	// Regex to match against the returned file
+	// Regex to match against the returned contents
 	ContentRegex string `json:"contentRegex" default:".*"`
 	// Shared configuration across all checks
 	checks.SharedDefinition

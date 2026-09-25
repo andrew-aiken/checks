@@ -3,6 +3,7 @@ module github.com/andrew-aiken/checks
 go 1.26.5
 
 require (
+	github.com/alicebob/miniredis/v2 v2.39.0
 	github.com/emersion/go-imap/v2 v2.0.0-beta.8
 	github.com/emersion/go-message v0.18.2
 	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6
@@ -24,6 +25,7 @@ require (
 	github.com/miekg/dns v1.1.72
 	github.com/nakagami/grdp v0.9.7
 	github.com/prometheus-community/pro-bing v0.9.1
+	github.com/redis/go-redis/v9 v9.22.0
 	github.com/slayercat/GoSNMPServer v0.5.2
 	github.com/spf13/afero v1.15.0
 	golang.org/x/crypto v0.54.0
@@ -41,6 +43,7 @@ require (
 	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be // indirect
 	github.com/bodgit/ntlmssp v0.0.0-20240506230425-31973bb52d9b // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -98,7 +101,9 @@ require (
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
+	github.com/yuin/gopher-lua v1.1.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/mod v0.37.0 // indirect

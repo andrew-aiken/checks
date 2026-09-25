@@ -38,9 +38,9 @@ type Definition struct {
 	Key string `json:"key"`
 	// Value to set when command is SET
 	Value string `json:"value"`
-	// Whether the file must match a defined regex for the check to pass
+	// Whether the value must match a defined regex for the check to pass
 	MatchContent bool `json:"matchContent" default:"false"`
-	// Regex to match against the returned file
+	// Regex to match against the keys value
 	ContentRegex string `json:"contentRegex" default:".*"`
 	// Shared configuration across all checks
 	checks.SharedDefinition

@@ -98,8 +98,14 @@ func TestRedisRun(t *testing.T) {
 
 	s := miniredis.RunT(t)
 
-	s.Set("foo", "bar")
-	s.Incr("int", 1)
+	err := s.Set("foo", "bar")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = s.Incr("int", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	host := s.Host()
 	port := s.Server().Addr().AddrPort().Port()
@@ -268,7 +274,10 @@ func TestRedisTLSRun(t *testing.T) {
 	password := "password"
 	s.RequireUserAuth(username, password)
 
-	s.Set("foo", "bar")
+	err = s.Set("foo", "bar")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	host := s.Host()
 	port := s.Server().Addr().AddrPort().Port()

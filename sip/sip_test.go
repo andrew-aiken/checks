@@ -37,22 +37,6 @@ func TestSIPValidate(t *testing.T) {
 			},
 			ValidateMessage: "Invalid SIP transport protocol specified",
 		},
-		{
-			Name: "PlaceCallMissingCallee",
-			Definition: sip.Definition{
-				Host:      "sip.neccdl.org",
-				PlaceCall: true,
-			},
-			ValidateMessage: "Callee needs to be defined when PlaceCall is set",
-		},
-		{
-			Name: "PlaceCallValid",
-			Definition: sip.Definition{
-				Host:      "sip.neccdl.org",
-				PlaceCall: true,
-				Callee:    "1002",
-			},
-		},
 	}
 
 	for _, tt := range tests {
@@ -106,7 +90,6 @@ func TestSIP(t *testing.T) {
 				Host:      host,
 				Port:      5060,
 				Transport: transport,
-				PlaceCall: true,
 				Callee:    callee,
 			},
 			Result: checks.Results{
@@ -121,7 +104,6 @@ func TestSIP(t *testing.T) {
 				Username:  username,
 				Password:  password,
 				Transport: transport,
-				PlaceCall: true,
 				Callee:    callee,
 			},
 			Result: checks.Results{
@@ -172,7 +154,6 @@ func TestSIP(t *testing.T) {
 				Host:      host,
 				Port:      5060,
 				Transport: transport,
-				PlaceCall: true,
 				Callee:    username,
 			},
 			Result: checks.Results{
@@ -185,7 +166,6 @@ func TestSIP(t *testing.T) {
 				Host:      host,
 				Port:      5099,
 				Transport: transport,
-				PlaceCall: true,
 				Callee:    callee,
 			},
 			Result: checks.Results{
@@ -198,7 +178,6 @@ func TestSIP(t *testing.T) {
 			Definition: sip.Definition{
 				Host:      "this-host-does-not-exist.invalid",
 				Transport: transport,
-				PlaceCall: true,
 				Callee:    callee,
 			},
 			Result: checks.Results{

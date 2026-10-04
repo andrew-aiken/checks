@@ -39,10 +39,8 @@ type Definition struct {
 	Username string `json:"username"`
 	// Extensions authentication secret
 	Password string `json:"password"`
-	// Whether to place a call to Callee as part of the check
-	PlaceCall bool `json:"placeCall" default:"false"`
-	// Extension to INVITE when PlaceCall is set
-	Callee string `json:"callee"`
+	// Extension to dial
+	Callee string `json:"callee" default:""`
 	// Shared configuration across all checks
 	checks.SharedDefinition
 }
@@ -95,7 +93,7 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	portString := strconv.Itoa(int(definition.Port))
 	address := net.JoinHostPort(definition.Host, portString)
 
-	if !definition.PlaceCall {
+	if definition.Callee == "" {
 		passed, message := registerClient(ctx, client, definition, address)
 		result.Passed = passed
 		result.Message = message
@@ -305,10 +303,6 @@ func (d Definition) Validate() (passed bool, message string) {
 
 	if !slices.Contains(transportProtocols, strings.ToUpper(d.Transport)) {
 		return false, "Invalid SIP transport protocol specified"
-	}
-
-	if d.PlaceCall && d.Callee == "" {
-		return false, "Callee needs to be defined when PlaceCall is set"
 	}
 
 	return true, ""

@@ -5,6 +5,7 @@ import (
 
 	"github.com/andrew-aiken/checks/dns"
 	"github.com/andrew-aiken/checks/ftp"
+	"github.com/andrew-aiken/checks/git"
 	"github.com/andrew-aiken/checks/http"
 	"github.com/andrew-aiken/checks/icmp"
 	"github.com/andrew-aiken/checks/imap"
@@ -15,6 +16,8 @@ import (
 	"github.com/andrew-aiken/checks/pop3"
 	"github.com/andrew-aiken/checks/postgresql"
 	"github.com/andrew-aiken/checks/rdp"
+	"github.com/andrew-aiken/checks/redis"
+	"github.com/andrew-aiken/checks/sip"
 	"github.com/andrew-aiken/checks/smb"
 	"github.com/andrew-aiken/checks/smtp"
 	"github.com/andrew-aiken/checks/snmp"
@@ -31,6 +34,8 @@ func NewDefinition(checkType string) (definitionType any, err error) {
 		return &dns.Definition{}, nil
 	case "ftp":
 		return &ftp.Definition{}, nil
+	case "git":
+		return &git.Definition{}, nil
 	case "http":
 		return &http.Definition{}, nil
 	case "icmp":
@@ -51,6 +56,10 @@ func NewDefinition(checkType string) (definitionType any, err error) {
 		return &postgresql.Definition{}, nil
 	case "rdp":
 		return &rdp.Definition{}, nil
+	case "redis":
+		return &redis.Definition{}, nil
+	case "sip":
+		return &sip.Definition{}, nil
 	case "smb":
 		return &smb.Definition{}, nil
 	case "smtp":

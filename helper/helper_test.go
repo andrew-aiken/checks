@@ -6,6 +6,7 @@ import (
 
 	"github.com/andrew-aiken/checks/dns"
 	"github.com/andrew-aiken/checks/ftp"
+	"github.com/andrew-aiken/checks/git"
 	"github.com/andrew-aiken/checks/helper"
 	"github.com/andrew-aiken/checks/http"
 	"github.com/andrew-aiken/checks/icmp"
@@ -17,6 +18,8 @@ import (
 	"github.com/andrew-aiken/checks/pop3"
 	"github.com/andrew-aiken/checks/postgresql"
 	"github.com/andrew-aiken/checks/rdp"
+	"github.com/andrew-aiken/checks/redis"
+	"github.com/andrew-aiken/checks/sip"
 	"github.com/andrew-aiken/checks/smb"
 	"github.com/andrew-aiken/checks/smtp"
 	"github.com/andrew-aiken/checks/snmp"
@@ -36,6 +39,7 @@ func TestNewDefinition(t *testing.T) {
 	tests := []Test{
 		{"dns", &dns.Definition{}, false},
 		{"ftp", &ftp.Definition{}, false},
+		{"git", &git.Definition{}, false},
 		{"http", &http.Definition{}, false},
 		{"icmp", &icmp.Definition{}, false},
 		{"imap", &imap.Definition{}, false},
@@ -46,6 +50,8 @@ func TestNewDefinition(t *testing.T) {
 		{"pop3", &pop3.Definition{}, false},
 		{"postgresql", &postgresql.Definition{}, false},
 		{"rdp", &rdp.Definition{}, false},
+		{"redis", &redis.Definition{}, false},
+		{"sip", &sip.Definition{}, false},
 		{"smb", &smb.Definition{}, false},
 		{"smtp", &smtp.Definition{}, false},
 		{"snmp", &snmp.Definition{}, false},

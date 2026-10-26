@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/andrew-aiken/checks/aws"
 	"github.com/andrew-aiken/checks/dns"
 	"github.com/andrew-aiken/checks/ftp"
 	"github.com/andrew-aiken/checks/git"
@@ -37,6 +38,7 @@ type Test struct {
 
 func TestNewDefinition(t *testing.T) {
 	tests := []Test{
+		{"aws", &aws.Definition{}, false},
 		{"dns", &dns.Definition{}, false},
 		{"ftp", &ftp.Definition{}, false},
 		{"git", &git.Definition{}, false},

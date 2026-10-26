@@ -3,6 +3,7 @@ package helper
 import (
 	"fmt"
 
+	"github.com/andrew-aiken/checks/aws"
 	"github.com/andrew-aiken/checks/dns"
 	"github.com/andrew-aiken/checks/ftp"
 	"github.com/andrew-aiken/checks/git"
@@ -30,6 +31,8 @@ import (
 // NewDefinition takes in a check type and returns its definition
 func NewDefinition(checkType string) (definitionType any, err error) {
 	switch checkType {
+	case "aws":
+		return &aws.Definition{}, nil
 	case "dns":
 		return &dns.Definition{}, nil
 	case "ftp":

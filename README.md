@@ -19,6 +19,7 @@ Unified check definitions that can be consumed across a wide variety of scoring 
 
 | Name                      | [Quotient](https://github.com/dbaseqp/Quotient) | [Scorestack](https://github.com/scorestack/scorestack) | [Scorify](https://github.com/Scorify/Scorify) | Checks |
 | :------------------------ | :---------------------------------------------: | :----------------------------------------------------: | :-------------------------------------------: | :----: |
+| [AWS](aws/)               |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [DNS](dns/)               |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [FTP](ftp/)               |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [GIT](git/)               |                       ⭕                        |                           ✅                           |                      ⭕                       |   ✅   |

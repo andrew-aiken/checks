@@ -79,7 +79,6 @@ func (d Definition) Run(ctx context.Context, static checks.StaticConf) (result c
 	return
 }
 
-
 // Validats the aws definition
 func (d Definition) Validate() (passed bool, message string) {
 	if d.AccessKey == "" {

@@ -85,12 +85,18 @@ func newFakeSTS(t *testing.T, accessKey, secretKey, account string) *httptest.Se
 		if code, err := verifySigV4(r, body, accessKey, secretKey); err != nil {
 			w.Header().Set("Content-Type", "text/xml")
 			w.WriteHeader(http.StatusForbidden)
-			fmt.Fprintf(w, `<ErrorResponse xmlns="https://sts.amazonaws.com/doc/2011-06-15/"><Error><Type>Sender</Type><Code>%s</Code><Message>%s</Message></Error><RequestId>test</RequestId></ErrorResponse>`, code, err)
+			_, fmtErr := fmt.Fprintf(w, `<ErrorResponse xmlns="https://sts.amazonaws.com/doc/2011-06-15/"><Error><Type>Sender</Type><Code>%s</Code><Message>%s</Message></Error><RequestId>test</RequestId></ErrorResponse>`, code, err)
+			if fmtErr != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 			return
 		}
 
 		w.Header().Set("Content-Type", "text/xml")
-		fmt.Fprintf(w, `<GetCallerIdentityResponse xmlns="https://sts.amazonaws.com/doc/2011-06-15/"><GetCallerIdentityResult><Arn>arn:aws:iam::%[1]s:user/test</Arn><UserId>%[2]s</UserId><Account>%[1]s</Account></GetCallerIdentityResult><ResponseMetadata><RequestId>test</RequestId></ResponseMetadata></GetCallerIdentityResponse>`, account, accessKey)
+		_, fmtErr := fmt.Fprintf(w, `<GetCallerIdentityResponse xmlns="https://sts.amazonaws.com/doc/2011-06-15/"><GetCallerIdentityResult><Arn>arn:aws:iam::%[1]s:user/test</Arn><UserId>%[2]s</UserId><Account>%[1]s</Account></GetCallerIdentityResult><ResponseMetadata><RequestId>test</RequestId></ResponseMetadata></GetCallerIdentityResponse>`, account, accessKey)
+		if fmtErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}))
 	t.Cleanup(server.Close)
 

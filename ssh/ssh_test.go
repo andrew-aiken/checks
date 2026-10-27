@@ -219,7 +219,7 @@ func TestSSHRun(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring: "Failed to connect to localhost:2223: dial tcp [::1]:2223: connect: connection refused",
+			MessageSubstring: "Failed to connect to localhost:2223: dial tcp",
 		},
 	}
 

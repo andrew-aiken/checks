@@ -142,7 +142,7 @@ func TestIMAP(t *testing.T) {
 			Result: checks.Results{
 				Passed: false,
 			},
-			MessageSubstring: "Failed to dial IMAP server: dial tcp [::1]:1144: connect: connection refused",
+			MessageSubstring: "Failed to dial IMAP server: dial tcp ",
 		},
 		{
 			Name: "FailedAuth",

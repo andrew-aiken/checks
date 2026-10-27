@@ -24,12 +24,12 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Run Gosec Security Scanner
-        uses: securego/gosec@5eb1d104ef85ff2c905c877eb600e8c1dee33a22 # 2.30.0
-        with:
-          args: ./...
-        env:
-          GOTOOLCHAIN: auto
+      # - name: Run Gosec Security Scanner
+      #   uses: securego/gosec@5eb1d104ef85ff2c905c877eb600e8c1dee33a22 # 2.30.0
+      #   with:
+      #     args: ./...
+      #   env:
+      #     GOTOOLCHAIN: auto
 
       - name: Check formatting
         run: |

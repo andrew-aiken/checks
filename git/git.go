@@ -27,8 +27,8 @@ import (
 type Definition struct {
 	// IP or FQDN of the git server
 	Host string `json:"host" optiontype:"required"`
-	// TCP port number the git server is listening on
-	Port uint16 `json:"port" default:"22"`
+	// TCP port number the git server is listening on, defaults to the protocol's standard port
+	Port uint16 `json:"port"`
 	// User to authenticate to the git repository
 	Username string `json:"username"`
 	// The users password

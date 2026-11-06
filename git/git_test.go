@@ -39,7 +39,6 @@ func TestGit(t *testing.T) {
 				File:             "CHANGELOG",
 				Branch:           "master",
 				Protocol:         "https",
-				Port:             443,
 				MatchContent:     true,
 				ContentRegex:     "Initial changelog",
 				MatchHeadHash:    true,

@@ -315,6 +315,18 @@ func TestSSHKey(t *testing.T) {
 			},
 		},
 		{
+			Name: "EscapedNewlineKey",
+			Definition: ssh.Definition{
+				Host:     serverHostName,
+				Username: username,
+				Key:      strings.ReplaceAll(string(sshPrivateKey), "\n", `\n`),
+				Port:     serverPort,
+			},
+			Result: checks.Results{
+				Passed: true,
+			},
+		},
+		{
 			Name: "KeyAndPassword",
 			Definition: ssh.Definition{
 				Host:     serverHostName,

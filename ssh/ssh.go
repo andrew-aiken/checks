@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/andrew-aiken/checks"
@@ -130,7 +131,7 @@ func (d Definition) generateAuth() (sshAuth []ssh.AuthMethod, err error) {
 
 	if d.Key != "" {
 		// Create the Signer for this private key.
-		signer, err := ssh.ParsePrivateKey([]byte(d.Key))
+		signer, err := ssh.ParsePrivateKey([]byte(strings.ReplaceAll(d.Key, `\n`, "\n")))
 		if err != nil {
 			return authMethods, fmt.Errorf("unable to parse private key: %v", err)
 		}

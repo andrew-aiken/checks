@@ -9,6 +9,7 @@ import (
 	"io"
 	"regexp"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/andrew-aiken/checks"
@@ -269,7 +270,7 @@ func generateCloneOptions(d Definition) (cloneOptions git.CloneOptions, err erro
 		if user == "" {
 			user = ssh.DefaultUsername
 		}
-		auth, err := ssh.NewPublicKeys(user, []byte(d.Key), "")
+		auth, err := ssh.NewPublicKeys(user, []byte(strings.ReplaceAll(d.Key, `\n`, "\n")), "")
 		if err != nil {
 			return cloneOptions, fmt.Errorf("unable to parse private key: %w", err)
 		}

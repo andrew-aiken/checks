@@ -256,6 +256,11 @@ func TestGitSSHKey(t *testing.T) {
 			Result: checks.Results{Passed: true},
 		},
 		{
+			Name:   "EscapedNewlineKey",
+			Key:    strings.ReplaceAll(authorizedPrivateKey, "\n", `\n`),
+			Result: checks.Results{Passed: true},
+		},
+		{
 			Name:             "UnauthorizedKey",
 			Key:              unauthorizedPrivateKey,
 			Result:           checks.Results{Passed: false},

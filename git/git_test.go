@@ -2,12 +2,24 @@ package git_test
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/rand"
+	"encoding/pem"
+	"net"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/andrew-aiken/checks"
 	"github.com/andrew-aiken/checks/git"
+
+	sshtest "github.com/gliderlabs/ssh"
+	gogit "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
+	gossh "golang.org/x/crypto/ssh"
 )
 
 func TestGit(t *testing.T) {
@@ -182,6 +194,136 @@ func TestGit(t *testing.T) {
 	}
 }
 
+func TestGitSSHKey(t *testing.T) {
+	repoDir := t.TempDir()
+	repo, err := gogit.PlainInit(repoDir, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(repoDir, "README.md"), []byte("hello over ssh\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	worktree, err := repo.Worktree()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := worktree.Add("README.md"); err != nil {
+		t.Fatal(err)
+	}
+	signature := &object.Signature{Name: "test", Email: "test@example.com", When: time.Now()}
+	if _, err := worktree.Commit("initial", &gogit.CommitOptions{Author: signature}); err != nil {
+		t.Fatal(err)
+	}
+
+	authorizedPublicKey, authorizedPrivateKey := generateKey(t)
+	_, unauthorizedPrivateKey := generateKey(t)
+
+	server := &sshtest.Server{
+		PublicKeyHandler: func(_ sshtest.Context, key sshtest.PublicKey) bool {
+			return sshtest.KeysEqual(key, authorizedPublicKey)
+		},
+		Handler: func(s sshtest.Session) {
+			cmd := exec.CommandContext(s.Context(), "git", "upload-pack", repoDir)
+			cmd.Stdin = s
+			cmd.Stdout = s
+			cmd.Stderr = s.Stderr()
+			if err := cmd.Run(); err != nil {
+				_ = s.Exit(1)
+				return
+			}
+			_ = s.Exit(0)
+		},
+	}
+
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	go func() { _ = server.Serve(listener) }()
+	t.Cleanup(func() { _ = server.Close() })
+
+	port := uint16(listener.Addr().(*net.TCPAddr).Port)
+
+	tests := []struct {
+		Name             string
+		Key              string
+		Result           checks.Results
+		MessageSubstring string
+	}{
+		{
+			Name:   "ValidKey",
+			Key:    authorizedPrivateKey,
+			Result: checks.Results{Passed: true},
+		},
+		{
+			Name:             "UnauthorizedKey",
+			Key:              unauthorizedPrivateKey,
+			Result:           checks.Results{Passed: false},
+			MessageSubstring: "Failed clone repository",
+		},
+		{
+			Name:             "InvalidKey",
+			Key:              "not-a-key",
+			Result:           checks.Results{Passed: false},
+			MessageSubstring: "Failed to generate clone options: unable to parse private key",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			definition := git.Definition{
+				Host:         "127.0.0.1",
+				Port:         port,
+				Protocol:     "ssh",
+				Path:         repoDir,
+				Branch:       "master",
+				Key:          tt.Key,
+				File:         "README.md",
+				MatchContent: true,
+				ContentRegex: "hello over ssh",
+			}
+
+			if pass, message := definition.Validate(); !pass {
+				t.Fatalf("Failed to validate check(%q) message %s", tt.Name, message)
+			}
+
+			timeoutContext, cxtCancel := context.WithTimeout(context.Background(), 3*time.Second)
+			defer cxtCancel()
+
+			result := definition.Run(timeoutContext, checks.StaticConf{})
+
+			if result.Passed != tt.Result.Passed {
+				t.Fatalf("Check does not match expected result: test(%q) got %t message %q", tt.Name, result.Passed, result.Message)
+			}
+
+			if tt.MessageSubstring != "" && !strings.Contains(result.Message, tt.MessageSubstring) {
+				t.Fatalf("Expected message substring %q for check(%q), got message %q", tt.MessageSubstring, tt.Name, result.Message)
+			}
+		})
+	}
+}
+
+func generateKey(t *testing.T) (gossh.PublicKey, string) {
+	t.Helper()
+
+	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sshPublicKey, err := gossh.NewPublicKey(publicKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pemBlock, err := gossh.MarshalPrivateKey(privateKey, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return sshPublicKey, string(pem.EncodeToMemory(pemBlock))
+}
+
 func TestGitValidate(t *testing.T) {
 	tests := []struct {
 		Name            string
@@ -228,7 +370,28 @@ func TestGitValidate(t *testing.T) {
 				Token:    "dummyToken",
 				Password: "dummyPasswd",
 			},
-			ValidateMessage: "Either token, password, or neither should be set",
+			ValidateMessage: "Only one of token, password, or key should be set",
+		},
+		{
+			Name: "KeyAndPassword",
+			Definition: git.Definition{
+				Host:     "git.neccdl.org",
+				Path:     "/admin/dummy.git",
+				Key:      "dummyKey",
+				Password: "dummyPasswd",
+				Protocol: "ssh",
+			},
+			ValidateMessage: "Only one of token, password, or key should be set",
+		},
+		{
+			Name: "KeyWithoutSSH",
+			Definition: git.Definition{
+				Host:     "git.neccdl.org",
+				Path:     "/admin/dummy.git",
+				Key:      "dummyKey",
+				Protocol: "https",
+			},
+			ValidateMessage: "Key authentication requires the ssh protocol",
 		},
 		{
 			Name: "InvalidProtocol",

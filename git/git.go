@@ -18,7 +18,9 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
+	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/go-git/go-git/v5/storage/memory"
+	gossh "golang.org/x/crypto/ssh"
 )
 
 type Definition struct {
@@ -32,7 +34,9 @@ type Definition struct {
 	Password string `json:"password"`
 	// Token used for authentication
 	Token string `json:"token"`
-	// How to connect to the git server
+	// SSH private key used for authentication
+	Key string `json:"key"`
+	// How to connect to the git server (https or ssh)
 	Protocol string `json:"protocol" default:"https"`
 	// Repository path to append to the host
 	Path string `json:"path" optiontype:"required"`
@@ -175,8 +179,18 @@ func (d Definition) Validate() (passed bool, message string) {
 		return false, "Path needs to be defined"
 	}
 
-	if d.Password != "" && d.Token != "" {
-		return false, "Either token, password, or neither should be set"
+	authMethods := 0
+	for _, v := range []string{d.Password, d.Token, d.Key} {
+		if v != "" {
+			authMethods++
+		}
+	}
+	if authMethods > 1 {
+		return false, "Only one of token, password, or key should be set"
+	}
+
+	if d.Key != "" && d.Protocol != "ssh" {
+		return false, "Key authentication requires the ssh protocol"
 	}
 
 	if d.Branch != "" && d.Tag != "" {
@@ -249,12 +263,24 @@ func generateCloneOptions(d Definition) (cloneOptions git.CloneOptions, err erro
 	}
 
 	// Setup authentication
-	if d.Token != "" {
+	switch {
+	case d.Key != "":
+		user := d.Username
+		if user == "" {
+			user = ssh.DefaultUsername
+		}
+		auth, err := ssh.NewPublicKeys(user, []byte(d.Key), "")
+		if err != nil {
+			return cloneOptions, fmt.Errorf("unable to parse private key: %w", err)
+		}
+		auth.HostKeyCallback = gossh.InsecureIgnoreHostKey() // #nosec G106
+		cloneOptions.Auth = auth
+	case d.Token != "":
 		cloneOptions.Auth = &http.BasicAuth{
 			Username: "placeholder",
 			Password: d.Token,
 		}
-	} else if d.Username != "" && d.Password != "" {
+	case d.Username != "" && d.Password != "":
 		cloneOptions.Auth = &http.BasicAuth{
 			Username: d.Username,
 			Password: d.Password,

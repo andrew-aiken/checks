@@ -34,6 +34,7 @@ Unified check definitions that can be consumed across a wide variety of scoring 
 | [PostgreSQL](postgresql/) |                       ⭕                        |                           ✅                           |                      ⭕                       |   ✅   |
 | [RDP](rdp/)               |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [Redis](redis/)           |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
+| [S3](s3/)                 |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [SIP](sip/)               |                       ⭕                        |                           ⭕                           |                      ⭕                       |   ✅   |
 | [SMB](smb/)               |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |
 | [SMTP](smtp/)             |                       ✅                        |                           ✅                           |                      ✅                       |   ✅   |

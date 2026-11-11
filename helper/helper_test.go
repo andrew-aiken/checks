@@ -20,6 +20,7 @@ import (
 	"github.com/andrew-aiken/checks/postgresql"
 	"github.com/andrew-aiken/checks/rdp"
 	"github.com/andrew-aiken/checks/redis"
+	"github.com/andrew-aiken/checks/s3"
 	"github.com/andrew-aiken/checks/sip"
 	"github.com/andrew-aiken/checks/smb"
 	"github.com/andrew-aiken/checks/smtp"
@@ -53,6 +54,7 @@ func TestNewDefinition(t *testing.T) {
 		{"postgresql", &postgresql.Definition{}, false},
 		{"rdp", &rdp.Definition{}, false},
 		{"redis", &redis.Definition{}, false},
+		{"s3", &s3.Definition{}, false},
 		{"sip", &sip.Definition{}, false},
 		{"smb", &smb.Definition{}, false},
 		{"smtp", &smtp.Definition{}, false},

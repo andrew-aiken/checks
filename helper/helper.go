@@ -18,6 +18,7 @@ import (
 	"github.com/andrew-aiken/checks/postgresql"
 	"github.com/andrew-aiken/checks/rdp"
 	"github.com/andrew-aiken/checks/redis"
+	"github.com/andrew-aiken/checks/s3"
 	"github.com/andrew-aiken/checks/sip"
 	"github.com/andrew-aiken/checks/smb"
 	"github.com/andrew-aiken/checks/smtp"
@@ -61,6 +62,8 @@ func NewDefinition(checkType string) (definitionType any, err error) {
 		return &rdp.Definition{}, nil
 	case "redis":
 		return &redis.Definition{}, nil
+	case "s3":
+		return &s3.Definition{}, nil
 	case "sip":
 		return &sip.Definition{}, nil
 	case "smb":
